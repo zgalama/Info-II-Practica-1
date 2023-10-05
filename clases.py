@@ -27,7 +27,7 @@ class Medico(Personaje):
 
     def habilidad(self, objetivo: Personaje):
         objetivo.vida_actual = objetivo.vida_maxima
-        print('Se ha curado al completo a {}, su salud ahora es {}'.format(objetivo.id, objetivo.vida_actual))
+        print('Se ha curado al completo a {}, su salud ahora es {}\n'.format(objetivo.id, objetivo.vida_actual))
 
 class Inteligencia(Personaje):
     def __init__(self) -> None:
@@ -64,51 +64,11 @@ class Inteligencia(Personaje):
                 avistados[enemigo.id] = enemigo.posicion
 
         if not avistados:
-            print('No se ha avistado a ningún enemigo')
+            print('No se ha avistado a ningún enemigo\n')
         else:
             print('Se han avistado enemigos: ')
             for ene, pos in avistados.items():
-                print(ene, 'en', pos)
-
-
-#--- PRUEBAS ---#
-
-j1 = Jugador('Felix')
-j2 = Jugador('Pepe')
-
-j1.oponente = j2
-j2.oponente = j1
-
-exp1 = Inteligencia()
-exp2 = Inteligencia()
-med1 = Medico()
-med2 = Medico()
-
-exp1.posicion = 'b2'
-exp2.posicion = 'c2'
-med1.posicion = 'a1'
-med2.posicion = 'd4'
-exp2.vida_actual = 1
-exp2.vida_maxima = 3
-
-
-j1.equipo.append(exp1)
-j1.equipo.append(med1)
-j2.equipo.append(exp2)
-j2.equipo.append(med2)
-
-exp1.habilidad('a1', j2)
-exp2.habilidad('a1', j1)
-
-med2.habilidad(exp2)
-
-
-
-
-
-
-
-
+                print(ene, 'en', pos, '\n')
 
 
 
