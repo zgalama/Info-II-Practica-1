@@ -70,6 +70,14 @@ class Inteligencia(Personaje):
             for ene, pos in avistados.items():
                 print(ene, 'en', pos, '\n')
 
+class Francotirador(Personaje): #-- Terminar Francotirador
+
+    def __init__(self):
+        super().__init__()
+        self.id = 'Francotirador'
+
+    def habilidad(self, posicion : str, opo : Jugador):
+        pass
 
 
 
