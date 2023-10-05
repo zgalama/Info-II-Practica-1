@@ -53,7 +53,7 @@ class Inteligencia(Personaje):
                             casillas_exploradas.extend([cas2, cas3, cas4])
                             casillas_exploradas #-- Lista con las casillas a explorar
                         except:
-                            error = print('La ubicacion seleccionada no es valida para un area 2x2')
+                            error = print('La ubicacion seleccionada no es valida para un area 2x2\n')
                             return error
 
         equipo_enemigo = opo.equipo
@@ -68,7 +68,8 @@ class Inteligencia(Personaje):
         else:
             print('Se han avistado enemigos: ')
             for ene, pos in avistados.items():
-                print(ene, 'en', pos, '\n')
+                print(ene, 'en', pos)
+            print('\n')
 
 class Francotirador(Personaje): #-- Terminar Francotirador
 
@@ -77,7 +78,14 @@ class Francotirador(Personaje): #-- Terminar Francotirador
         self.id = 'Francotirador'
 
     def habilidad(self, posicion : str, opo : Jugador):
-        pass
+        equipo_enemigo = opo.equipo
+        for enemigo in equipo_enemigo:
+            if enemigo.posicion == posicion:
+                enemigo.vida_actual = 0
+
+
+
+
 
 
 
