@@ -27,6 +27,7 @@ class Medico(Personaje):
 
     def habilidad(self, objetivo: Personaje):
         objetivo.vida_actual = objetivo.vida_maxima
+        print('Se ha curado al completo a {}, su salud ahora es {}'.format(objetivo.id, objetivo.vida_actual))
 
 class Inteligencia(Personaje):
     def __init__(self) -> None:
@@ -87,6 +88,9 @@ exp1.posicion = 'b2'
 exp2.posicion = 'c2'
 med1.posicion = 'a1'
 med2.posicion = 'd4'
+exp2.vida_actual = 1
+exp2.vida_maxima = 3
+
 
 j1.equipo.append(exp1)
 j1.equipo.append(med1)
@@ -95,6 +99,9 @@ j2.equipo.append(med2)
 
 exp1.habilidad('a1', j2)
 exp2.habilidad('a1', j1)
+
+med2.habilidad(exp2)
+
 
 
 
