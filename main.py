@@ -1,4 +1,4 @@
-from clases import (Jugador, Personaje, Medico, Inteligencia, Francotirador)
+from clases import (Jugador, Personaje, Medico, Inteligencia, Francotirador, Artillero)
 
 #--- PRUEBAS ---#
 
@@ -8,30 +8,22 @@ j2 = Jugador('Felix')
 j1.oponente = j2
 j2.oponente = j1
 
-exp1 = Inteligencia()
-exp2 = Inteligencia()
 med1 = Medico()
+art1 = Artillero()
+frc1 = Francotirador()
+int1 = Inteligencia()
+equipo1 = [med1,int1,art1,frc1]
+j1.anadir_personanjes(equipo1)
+
 med2 = Medico()
-frn1 = Francotirador()
+art2 = Artillero()
+frc2 = Francotirador()
+int2 = Inteligencia()
+equipo2 = [med2,int2,art2,frc2]
+j2.anadir_personanjes(equipo2)
 
-exp1.posicion = 'c3'
-exp2.posicion = 'a1'
-frn1.posicion = 'd3'
-med1.posicion = 'd1'
-med2.posicion = 'b4'
-exp2.vida_actual = 3
-exp2.vida_maxima = 3
+print(j1.equipo[0].vida_actual)
 
-j1.equipo.append(exp1)
-j1.equipo.append(med1)
-j1.equipo.append(frn1)
-j2.equipo.append(exp2)
-j2.equipo.append(med2)
 
-exp1.habilidad('d3', j2)
-exp2.habilidad('c2', j1)
-frn1.habilidad('b4',j2)
-
-print(med2.vida_actual)
 
 

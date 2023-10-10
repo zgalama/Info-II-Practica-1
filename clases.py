@@ -24,6 +24,8 @@ class Medico(Personaje):
     def __init__(self) -> None:
         super().__init__()
         self.id = 'Medico'
+        self.vida_maxima = 1
+        self.vida_actual = 1
 
     def habilidad(self, objetivo: Personaje):
         objetivo.vida_actual = objetivo.vida_maxima
@@ -33,6 +35,8 @@ class Inteligencia(Personaje):
     def __init__(self) -> None:
         super().__init__()
         self.id = 'Inteligencia'
+        self.vida_maxima = 2
+        self.vida_actual = 2
 
     def habilidad(self, posicion : str, opo : Jugador):
         letras_casillas = ('a', 'b', 'c', 'd')
@@ -75,6 +79,8 @@ class Francotirador(Personaje):
     def __init__(self):
         super().__init__()
         self.id = 'Francotirador'
+        self.vida_maxima = 3
+        self.vida_actual = 3
 
     def habilidad(self, posicion : str, opo : Jugador):
         equipo_enemigo = opo.equipo
@@ -86,6 +92,8 @@ class Artillero(Personaje):
     def __init__(self):
         super().__init__()
         self.id = 'Artillero'
+        self.vida_maxima = 2
+        self.vida_actual = 2
 
     def habilidad(self, posicion : str, opo : Jugador):
         letras_casillas = ('a', 'b', 'c', 'd')
