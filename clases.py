@@ -1,11 +1,17 @@
+from utils import limpiar_terminal
+
 class Jugador:
-    def __init__(self, nom) -> None:
-        self.nombre = nom
+    def __init__(self) -> None:
         self.oponente = Jugador
         self.equipo = list()
         self.informe = str
+
+    def turno(self):
+        for enemigo in self.oponente.equipo:
+            pass
+
     def realizar_accion(self) -> str:
-        pass
+        num_accion = input('Selecciona la acción')
 
     def crear_equipo(self):
         M = Medico()
@@ -60,15 +66,14 @@ class Personaje:
             diff_number = abs(int(list_pos[1]) - int(list_npos[1]))
 
             if ((diff_letter == 1 and diff_number == 0) or \
-                (diff_letter == 0 and diff_number == 1) or \
-                (diff_letter == 1 and diff_number == 1)) and \
-                    (pos_nueva not in pos_ocupadas) and (pos_nueva in tablero):
+            (diff_letter == 0 and diff_number == 1) or \
+            (diff_letter == 1 and diff_number == 1)) and \
+            (pos_nueva not in pos_ocupadas) and (pos_nueva in tablero):
                 self.posicion = pos_nueva
                 print(f'{self.id} se ha movido a {self.posicion}')
                 break
             else:
                 print(f'La casilla no es válida')
-
 
 class Medico(Personaje):
     def __init__(self) -> None:
@@ -77,9 +82,10 @@ class Medico(Personaje):
         self.vida_maxima = 1
         self.vida_actual = 1
 
-    def habilidad(self, objetivo: Personaje):
+    def habilidad(self, objetivo: Personaje) -> None:
         objetivo.vida_actual = objetivo.vida_maxima
         print('Se ha curado al completo a {}, su salud ahora es {}\n'.format(objetivo.id, objetivo.vida_actual))
+
 
 class Inteligencia(Personaje):
     def __init__(self) -> None:
@@ -88,10 +94,11 @@ class Inteligencia(Personaje):
         self.vida_maxima = 2
         self.vida_actual = 2
 
-    def habilidad(self, posicion : str, opo : Jugador):
+    def habilidad(self, opo : Jugador) -> str:
         letras_casillas = ('a', 'b', 'c', 'd')
         numeros_casillas = ('1', '2', '3', '4')
 
+        posicion = input('Selecciona la casilla superior derecha del area 2x2 a explorar: ')
         casillas_exploradas = [posicion]
 
         for letra in letras_casillas:
@@ -124,6 +131,8 @@ class Inteligencia(Personaje):
             for ene, pos in avistados.items():
                 print(ene, 'en', pos)
             print('\n')
+
+        return f'I{posicion[0]}{posicion[1]}'
 
 class Francotirador(Personaje):
     def __init__(self):
@@ -177,6 +186,30 @@ class Artillero(Personaje):
 
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
+
+j1 = Jugador()
+j2 = Jugador()
+
+j1.oponente = j2
+j2.oponente = j1
+
+j1.crear_equipo()
+limpiar_terminal()
+
+j2.crear_equipo()
+limpiar_terminal()
+
+j1.posicionar_equipo()
+limpiar_terminal()
+
+j2.posicionar_equipo()
+limpiar_terminal()
+
+palabra = j1.equipo[1].habilidad(j2)
+print(palabra)
+limpiar_terminal()
+
+j2.equipo[3].mover()
 
 
 

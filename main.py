@@ -1,20 +1,50 @@
 from clases import (Jugador, Personaje, Medico, Inteligencia, Francotirador, Artillero)
+from utils import limpiar_terminal
 
-#--- PRUEBAS ---#
+def main():
 
-j1 = Jugador('Rosa')
-j2 = Jugador('Felix')
+    print('Bienvenidos a Tactical Battle. A jugar!\n')
+    input('Turno del Jugador 1. Pulsa intro para comenzar')
+    j1 = Jugador()
+    input('Jugador 1, pulsa intro para terminar tu turno')
+    limpiar_terminal()
+    input('Turno del Jugador 2. Pulsa intro para comenzar')
+    j2 = Jugador()
+    input('Jugador 2, pulsa intro para terminar tu turno')
+    limpiar_terminal()
+    j1.oponente = j2
+    j2.oponente = j1
+    final = False
 
-j1.oponente = j2
-j2.oponente = j1
+    while not final:
 
-j1.crear_equipo()
-j2.crear_equipo()
+        input('Turno del Jugador 1. Pulsa intro para comenzar')
+        final = j1.turno()
+        if final:
+            print("***** El jugador 1 ha ganado la partida! *****")
+            return 0
+        input('Jugador 1, pulsa intro para terminar tu turno')
+        limpiar_terminal()
 
-j1.posicionar_equipo()
+        input('Turno del Jugador 2. Pulsa intro para comenzar')
+        final = j2.turno()
+        if final:
+            print("***** El jugador 2 ha ganado la partida! *****")
+            return 0
+        input('Jugador 2, pulsa intro para terminar tu turno')
+        limpiar_terminal()
 
-j1.equipo[1].mover()
-j1.equipo[2].mover()
+if __name__ == '__main__':
+
+    main()
+
+
+
+
+
+
+
+
 
 
 
