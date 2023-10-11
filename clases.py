@@ -4,9 +4,34 @@ class Jugador:
         self.oponente = Jugador
         self.equipo = list()
         self.informe = str
-    def anadir_personanjes(self, lista_de_personajes: list):
-        for personaje in lista_de_personajes:
-            self.equipo.append(personaje)
+    def realizar_accion(self) -> str:
+        pass
+
+    def crear_equipo(self):
+        M = Medico()
+        I = Inteligencia()
+        A = Artillero()
+        F = Francotirador()
+        self.equipo.extend([M,I,A,F])
+        M.equipo.extend([I,A,F])
+        I.equipo.extend([M,A,F])
+        A.equipo.extend([M,I,F])
+        F.equipo.extend([M,I,A])
+    def posicionar_equipo(self):
+
+        pos_init = []
+        valid_pos = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
+
+        for personaje in self.equipo:
+            pos = input(f'Escriba la posicion inicial de {personaje.id}: ')
+            while pos in pos_init:
+                pos = input(f'Otro personaje ya ocupa esa casilla, escoja otra posicion para el {personaje.id}: ')
+            while pos not in valid_pos:
+                pos = input(f'La posicion no está en el tablero, escriba la posicion para el {personaje.id}: ')
+            pos_init.append(pos)
+            personaje.posicion = pos
+    def recibir_accion(self, s : str):
+        pass
 
 class Personaje:
     def __init__(self) -> None:
@@ -17,8 +42,36 @@ class Personaje:
         self.enfriamiento_restante = int
         self.equipo = list()
 
-    def mover(self, pos: str):
-        self.posicion = pos
+    def mover(self):
+
+        tablero = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
+        pos_ocupadas = []
+        pos_actual = self.posicion
+
+        for personaje in self.equipo:
+            pos_ocupadas.append(personaje.posicion)
+
+        pos_nueva = input(f'Escribe a la casila a la que quieres mover el {self.id}')
+
+        list_pos = list(pos_actual)
+        list_npos = list(pos_nueva)
+
+        while pos_nueva not in tablero:
+            pos_nueva = input(f'La posicion que ha escrito no esta en el tablero, escoja una posicion para mover {self.id}: ')
+            while pos_nueva in pos_ocupadas:
+                pos_nueva = input(f'La posicion que ha escrito ya esta ocupada, escoja una posicion para mover {self.id}: ')
+                while (abs(ord(list_pos[0]) - ord(list_npos[0])) != 1 and list_pos[1] != list_npos[1]) or (ord(list_pos) != ord(list_npos) and abs(list_pos[1] - list_npos[1] != 1)):
+                    pos_nueva = input(f'La posicion no está a una casilla de distancia, el movimiento no es valido, escriba de nuevo la posicion a la que se movera {self.id}')
+                    list_npos = list(pos_nueva)
+
+        self.posicion == pos_nueva
+
+
+
+
+
+
+
 
 class Medico(Personaje):
     def __init__(self) -> None:
