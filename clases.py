@@ -50,28 +50,20 @@ class Personaje:
 
         for personaje in self.equipo:
             pos_ocupadas.append(personaje.posicion)
+        pos_ocupadas.append(pos_actual)
 
-        pos_nueva = input(f'Escribe a la casila a la que quieres mover el {self.id}')
+        pos_nueva = input(f'Escribe a la casila a la que quieres mover el {self.id}: ')
 
         list_pos = list(pos_actual)
         list_npos = list(pos_nueva)
 
-        while pos_nueva not in tablero:
-            pos_nueva = input(f'La posicion que ha escrito no esta en el tablero, escoja una posicion para mover {self.id}: ')
-            while pos_nueva in pos_ocupadas:
-                pos_nueva = input(f'La posicion que ha escrito ya esta ocupada, escoja una posicion para mover {self.id}: ')
-                while (abs(ord(list_pos[0]) - ord(list_npos[0])) != 1 and list_pos[1] != list_npos[1]) or (ord(list_pos) != ord(list_npos) and abs(list_pos[1] - list_npos[1] != 1)):
-                    pos_nueva = input(f'La posicion no está a una casilla de distancia, el movimiento no es valido, escriba de nuevo la posicion a la que se movera {self.id}')
-                    list_npos = list(pos_nueva)
+        while (abs(ord(list_pos[0]) - ord(list_npos[0])) != 1 and list_pos[1] != list_npos[1]) and (ord(list_pos[0]) != ord(list_npos[0]) and abs(int(list_pos[1]) - int(list_npos[1])) != 1) or (pos_nueva in pos_ocupadas) or (pos_nueva not in tablero):
 
-        self.posicion == pos_nueva
+            pos_nueva = input(f'La casilla no es válida, escriba de nuevo la posicion a la que se movera {self.id}')
+            list_npos = list(pos_nueva)
 
-
-
-
-
-
-
+        self.posicion = pos_nueva
+        print(f'{self.id} se ha movido a {self.posicion}')
 
 class Medico(Personaje):
     def __init__(self) -> None:
@@ -180,6 +172,24 @@ class Artillero(Personaje):
 
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
+
+j1 = Jugador('Rosa')
+j2 = Jugador('Felix')
+
+j1.oponente = j2
+j2.oponente = j1
+
+j1.crear_equipo()
+j2.crear_equipo()
+
+j1.posicionar_equipo()
+
+print(j1.equipo[1].posicion)
+
+j1.equipo[1].mover()
+print(j1.equipo[1].posicion)
+print(j1.equipo[0].equipo[0].posicion)
+
 
 
 

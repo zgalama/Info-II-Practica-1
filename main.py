@@ -15,9 +15,9 @@ j1.posicionar_equipo()
 
 print(j1.equipo[1].posicion)
 
-print(j1.equipo[1].equipo)
-j1.equipo[2].mover()
-
+j1.equipo[1].mover()
+print(j1.equipo[0].posicion)
+print(j1.equipo[0].equipo[0].posicion)
 
 
 
