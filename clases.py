@@ -24,10 +24,9 @@ class Jugador:
 
         for personaje in self.equipo:
             pos = input(f'Escriba la posicion inicial de {personaje.id}: ')
-            while pos in pos_init:
-                pos = input(f'Otro personaje ya ocupa esa casilla, escoja otra posicion para el {personaje.id}: ')
-            while pos not in valid_pos:
-                pos = input(f'La posicion no está en el tablero, escriba la posicion para el {personaje.id}: ')
+            while pos in pos_init or pos not in valid_pos:
+                pos = input(f'La casilla no es valida, escoja otra posicion para el {personaje.id}: ')
+
             pos_init.append(pos)
             personaje.posicion = pos
     def recibir_accion(self, s : str):
@@ -52,18 +51,24 @@ class Personaje:
             pos_ocupadas.append(personaje.posicion)
         pos_ocupadas.append(pos_actual)
 
-        pos_nueva = input(f'Escribe a la casila a la que quieres mover el {self.id}: ')
-
-        list_pos = list(pos_actual)
-        list_npos = list(pos_nueva)
-
-        while (abs(ord(list_pos[0]) - ord(list_npos[0])) != 1 and list_pos[1] != list_npos[1]) and (ord(list_pos[0]) != ord(list_npos[0]) and abs(int(list_pos[1]) - int(list_npos[1])) != 1) or (pos_nueva in pos_ocupadas) or (pos_nueva not in tablero):
-
-            pos_nueva = input(f'La casilla no es válida, escriba de nuevo la posicion a la que se movera {self.id}')
+        while True:
+            pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id}: ')
+            list_pos = list(pos_actual)
             list_npos = list(pos_nueva)
 
-        self.posicion = pos_nueva
-        print(f'{self.id} se ha movido a {self.posicion}')
+            diff_letter = abs(ord(list_pos[0]) - ord(list_npos[0]))
+            diff_number = abs(int(list_pos[1]) - int(list_npos[1]))
+
+            if ((diff_letter == 1 and diff_number == 0) or \
+                (diff_letter == 0 and diff_number == 1) or \
+                (diff_letter == 1 and diff_number == 1)) and \
+                    (pos_nueva not in pos_ocupadas) and (pos_nueva in tablero):
+                self.posicion = pos_nueva
+                print(f'{self.id} se ha movido a {self.posicion}')
+                break
+            else:
+                print(f'La casilla no es válida')
+
 
 class Medico(Personaje):
     def __init__(self) -> None:
@@ -183,12 +188,7 @@ j1.crear_equipo()
 j2.crear_equipo()
 
 j1.posicionar_equipo()
-
-print(j1.equipo[1].posicion)
-
-j1.equipo[1].mover()
-print(j1.equipo[1].posicion)
-print(j1.equipo[0].equipo[0].posicion)
+j1.equipo[0].mover()
 
 
 

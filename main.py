@@ -13,11 +13,10 @@ j2.crear_equipo()
 
 j1.posicionar_equipo()
 
-print(j1.equipo[1].posicion)
-
 j1.equipo[1].mover()
-print(j1.equipo[0].posicion)
-print(j1.equipo[0].equipo[0].posicion)
+j1.equipo[2].mover()
+
+
 
 
 
