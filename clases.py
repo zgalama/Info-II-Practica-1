@@ -1,5 +1,7 @@
 from utils import limpiar_terminal
 
+tablero = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
+
 class Jugador:
     def __init__(self) -> None:
         self.oponente = Jugador
@@ -14,7 +16,7 @@ class Jugador:
                 return False
 
     def realizar_accion(self) -> str:
-        num_accion = input('Selecciona la acción siguiente:')
+        num_accion = int(input('Selecciona la acción siguiente: '))
         if num_accion == 1:
             self.equipo[0].mover()
         elif num_accion == 2:
@@ -22,7 +24,7 @@ class Jugador:
         elif num_accion == 3:
             self.equipo[1].mover()
         elif num_accion == 4:
-            self.equipo[1].habilidad()
+            self.equipo[1].habilidad(self.oponente)
         elif num_accion == 5:
             self.equipo[2].mover()
         elif num_accion == 6:
@@ -30,7 +32,7 @@ class Jugador:
         elif num_accion == 7:
             self.equipo[3].mover()
         elif num_accion == 8:
-            self.equipo[3].habilidad()
+            self.equipo[3].habilidad(self.oponente)
 
 
     def crear_equipo(self):
@@ -69,7 +71,7 @@ class Personaje:
 
     def mover(self) -> None:
 
-        tablero = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
+
         pos_ocupadas = []
         pos_actual = self.posicion
 
@@ -161,7 +163,10 @@ class Francotirador(Personaje):
         self.vida_maxima = 3
         self.vida_actual = 3
 
-    def habilidad(self, posicion : str, opo : Jugador):
+    def habilidad(self, opo : Jugador):
+        posicion = input('Introduzca la casilla a la que disparar: ')
+        while posicion not in tablero:
+            posicion = input('Esa casilla no existe, introduzca una casilla válida: ')
         equipo_enemigo = opo.equipo
         for enemigo in equipo_enemigo:
             if enemigo.posicion == posicion:

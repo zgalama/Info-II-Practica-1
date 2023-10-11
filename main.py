@@ -1,5 +1,5 @@
 from clases import (Jugador, Personaje, Medico, Inteligencia, Francotirador, Artillero)
-from utils import limpiar_terminal
+from utils import (limpiar_terminal, eliminar_personajes_muertos)
 
 def main():
 
@@ -27,27 +27,29 @@ def main():
     while not final:
 
         input('Turno del Jugador 1. Pulsa intro para comenzar')
+        eliminar_personajes_muertos(j1.equipo)
         final = j1.turno()
         if final:
             print("***** El jugador 1 ha ganado la partida! *****")
             return 0
 
         j1.realizar_accion()
-        if res != None:
-            j2.recibir_accion()
+
+
         input('Jugador 1, pulsa intro para terminar tu turno')
 
         limpiar_terminal()
 
         input('Turno del Jugador 2. Pulsa intro para comenzar')
+        eliminar_personajes_muertos(j2.equipo)
         final = j2.turno()
         if final:
             print("***** El jugador 2 ha ganado la partida! *****")
             return 0
 
         j2.realizar_accion()
-        if res != None:
-            j1.recibir_accion()
+
+
         input('Jugador 2, pulsa intro para terminar tu turno')
 
         limpiar_terminal()
