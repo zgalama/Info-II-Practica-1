@@ -178,17 +178,7 @@ class Artillero(Personaje):
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
 
-j1 = Jugador('Rosa')
-j2 = Jugador('Felix')
 
-j1.oponente = j2
-j2.oponente = j1
-
-j1.crear_equipo()
-j2.crear_equipo()
-
-j1.posicionar_equipo()
-j1.equipo[0].mover()
 
 
 
