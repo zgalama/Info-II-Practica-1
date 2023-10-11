@@ -8,10 +8,30 @@ class Jugador:
 
     def turno(self):
         for enemigo in self.oponente.equipo:
-            pass
+            if self.equipo[2].vida_actual == 0 and self.equipo[3].vida_actual == 0:
+                return True
+            else:
+                return False
 
     def realizar_accion(self) -> str:
-        num_accion = input('Selecciona la acción')
+        num_accion = input('Selecciona la acción siguiente:')
+        if num_accion == 1:
+            self.equipo[0].mover()
+        elif num_accion == 2:
+            self.equipo[0].habilidad()
+        elif num_accion == 3:
+            self.equipo[1].mover()
+        elif num_accion == 4:
+            self.equipo[1].habilidad()
+        elif num_accion == 5:
+            self.equipo[2].mover()
+        elif num_accion == 6:
+            self.equipo[2].habilidad()
+        elif num_accion == 7:
+            self.equipo[3].mover()
+        elif num_accion == 8:
+            self.equipo[3].habilidad()
+
 
     def crear_equipo(self):
         M = Medico()
@@ -23,8 +43,8 @@ class Jugador:
         I.equipo.extend([M,A,F])
         A.equipo.extend([M,I,F])
         F.equipo.extend([M,I,A])
-    def posicionar_equipo(self):
 
+    def posicionar_equipo(self):
         pos_init = []
         valid_pos = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
 
@@ -47,7 +67,7 @@ class Personaje:
         self.enfriamiento_restante = int
         self.equipo = list()
 
-    def mover(self):
+    def mover(self) -> None:
 
         tablero = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
         pos_ocupadas = []
@@ -187,29 +207,7 @@ class Artillero(Personaje):
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
 
-j1 = Jugador()
-j2 = Jugador()
 
-j1.oponente = j2
-j2.oponente = j1
-
-j1.crear_equipo()
-limpiar_terminal()
-
-j2.crear_equipo()
-limpiar_terminal()
-
-j1.posicionar_equipo()
-limpiar_terminal()
-
-j2.posicionar_equipo()
-limpiar_terminal()
-
-palabra = j1.equipo[1].habilidad(j2)
-print(palabra)
-limpiar_terminal()
-
-j2.equipo[3].mover()
 
 
 
