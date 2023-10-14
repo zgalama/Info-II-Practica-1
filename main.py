@@ -3,20 +3,20 @@ from utils import (limpiar_terminal, eliminar_personajes_muertos)
 
 def main():
 
-    print('Bienvenidos a Tactical Battle. A jugar!\n')
+    print('Bienvenidos a Tactical Battle. A jugar! \n')
 
-    input('Turno del Jugador 1. Pulsa intro para comenzar')
+    input('Turno del Jugador 1. Pulsa intro para comenzar ')
     j1 = Jugador()
     j1.crear_equipo()
     j1.posicionar_equipo()
-    input('Jugador 1, pulsa intro para terminar tu turno')
+    input('Jugador 1, pulsa intro para terminar tu turno ')
     limpiar_terminal()
 
-    input('Turno del Jugador 2. Pulsa intro para comenzar')
+    input('Turno del Jugador 2. Pulsa intro para comenzar ')
     j2 = Jugador()
     j2.crear_equipo()
     j2.posicionar_equipo()
-    input('Jugador 2, pulsa intro para terminar tu turno')
+    input('Jugador 2, pulsa intro para terminar tu turno ')
     limpiar_terminal()
 
     j1.oponente = j2
@@ -26,34 +26,38 @@ def main():
 
     while not final:
 
-        input('Turno del Jugador 1. Pulsa intro para comenzar')
-        limpiar_terminal()
+        #-- TURNO JUGADOR 1
 
         eliminar_personajes_muertos(j1.equipo)
-        final = j1.turno()
-        if final:
-            print("***** El jugador 1 ha ganado la partida! *****")
-            return 0
-
-        j1.realizar_accion()
-
-
-        input('Jugador 1, pulsa intro para terminar tu turno')
-        limpiar_terminal()
-
-        input('Turno del Jugador 2. Pulsa intro para comenzar')
-        limpiar_terminal()
-
-        eliminar_personajes_muertos(j2.equipo)
         final = j2.turno()
         if final:
-            print("***** El jugador 2 ha ganado la partida! *****")
+            print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
             return 0
 
-        j2.realizar_accion()
+        input('Turno del Jugador 1. Pulsa intro para comenzar ')
+        limpiar_terminal()
 
+        str1 = j1.realizar_accion()
+        j2.recibir_accion(str1)
 
-        input('Jugador 2, pulsa intro para terminar tu turno')
+        input('Jugador 1, pulsa intro para terminar tu turno ')
+        limpiar_terminal()
+
+        #-- TURNO JUGADOR 2
+
+        eliminar_personajes_muertos(j2.equipo)
+        final = j1.turno()
+        if final:
+            print(" ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ")
+            return 0
+
+        input('Turno del Jugador 2. Pulsa intro para comenzar ')
+        limpiar_terminal()
+
+        str2 = j2.realizar_accion()
+        j1.recibir_accion(str2)
+
+        input('Jugador 2, pulsa intro para terminar tu turno ')
 
         limpiar_terminal()
 

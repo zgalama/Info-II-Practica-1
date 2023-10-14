@@ -9,11 +9,14 @@ class Jugador:
         self.informe = str
 
     def turno(self):
-        for enemigo in self.oponente.equipo:
-            if self.equipo[2].vida_actual == 0 and self.equipo[3].vida_actual == 0:
-                return True
-            else:
-                return False
+        oponentes = []
+        for oponente in self.oponente.equipo:
+            oponentes.append(oponente.id)
+        if 'Artillero' not in oponentes and 'Francotirador' not in oponentes:
+            return True
+        else:
+            return False
+
 
     def realizar_accion(self) -> str:
 
@@ -77,12 +80,14 @@ class Jugador:
             id_personaje = opciones_personajes[num_accion][num_accion]
             for personaje in self.equipo:
                 if id_personaje == personaje.id:
-                    personaje.mover()
+                    str_r = personaje.mover()
+                    return str_r
         else:
             id_personaje = opciones_personajes[num_accion][num_accion]
             for personaje in self.equipo:
                 if id_personaje == personaje.id:
-                    personaje.habilidad(self.oponente)
+                    str_r = personaje.habilidad(self.oponente)
+                    return str_r
 
     def crear_equipo(self):
         M = Medico()
@@ -106,7 +111,7 @@ class Jugador:
 
             pos_init.append(pos)
             personaje.posicion = pos
-    def recibir_accion(self, s : str):
+    def recibir_accion(self, STR: str):
         pass
 
 class Personaje:
@@ -141,6 +146,7 @@ class Personaje:
             (pos_nueva not in pos_ocupadas) and (pos_nueva in tablero):
                 self.posicion = pos_nueva
                 print(f'{self.id} se ha movido a {self.posicion}')
+                return 'move'
                 break
             else:
                 print(f'La casilla no es válida')
@@ -227,14 +233,20 @@ class Francotirador(Personaje):
         self.vida_actual = 3
 
     def habilidad(self, opo : Jugador):
+
         posicion = input('Introduzca la casilla a la que disparar: ')
+        diana =[]
+
         while posicion not in tablero:
             posicion = input('Esa casilla no existe, introduzca una casilla válida: ')
         equipo_enemigo = opo.equipo
         for enemigo in equipo_enemigo:
             if enemigo.posicion == posicion:
                 enemigo.vida_actual = 0
+                diana.append(enemigo)
                 print(f'{enemigo.id} ha caído!')
+        if not diana:
+            print(f'No se ha matado a ningún enemigo en {posicion}')
 
 class Artillero(Personaje):
     def __init__(self):
