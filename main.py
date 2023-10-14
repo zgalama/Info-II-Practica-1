@@ -3,6 +3,8 @@ from utils import (limpiar_terminal, eliminar_personajes_muertos)
 
 def main():
 
+    print('')
+
     print('Bienvenidos a Tactical Battle. A jugar! \n')
 
     input('Turno del Jugador 1. Pulsa intro para comenzar ')

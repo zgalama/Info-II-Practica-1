@@ -10,13 +10,14 @@ def eliminar_personajes_muertos(equipo : list):
 def casillas_2x2(STR):
     STR = list(STR)
     casilla_puntero = STR[1:]
-    casillas_afectadas = [casilla_puntero]
+    casilla = f'{casilla_puntero[0]}{casilla_puntero[1]}'
+    casillas_afectadas = [casilla]
     ascii_letra = ord(casilla_puntero[0])
     num = int(casilla_puntero[1])
 
-    c2 = str(ascii_letra + 1) + str(num)
-    c3 = str(ascii_letra) + str(num + 1)
-    c4 = str(ascii_letra + 1) + str(num + 1)
+    c2 = chr(ascii_letra + 1) + str(num)
+    c3 = chr(ascii_letra) + str(num + 1)
+    c4 = chr(ascii_letra + 1) + str(num + 1)
 
     casillas_afectadas.append(c2)
     casillas_afectadas.append(c3)
