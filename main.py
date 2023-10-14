@@ -24,17 +24,12 @@ def main():
 
     final = False
 
+    input('Turno del Jugador 1. Pulsa intro para comenzar ')
+
     while not final:
 
         #-- TURNO JUGADOR 1
 
-        eliminar_personajes_muertos(j1.equipo)
-        final = j2.turno()
-        if final:
-            print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
-            return 0
-
-        input('Turno del Jugador 1. Pulsa intro para comenzar ')
         limpiar_terminal()
 
         str1 = j1.realizar_accion()
@@ -52,6 +47,7 @@ def main():
             return 0
 
         input('Turno del Jugador 2. Pulsa intro para comenzar ')
+        print(j2.informe)
         limpiar_terminal()
 
         str2 = j2.realizar_accion()
@@ -60,6 +56,15 @@ def main():
         input('Jugador 2, pulsa intro para terminar tu turno ')
 
         limpiar_terminal()
+
+        eliminar_personajes_muertos(j1.equipo)
+        final = j2.turno()
+        if final:
+            print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
+            return 0
+
+        input('Turno del Jugador 1. Pulsa intro para comenzar ')
+        print(j1.informe)
 
 if __name__ == '__main__':
 

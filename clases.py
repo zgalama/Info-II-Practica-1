@@ -1,4 +1,4 @@
-from utils import limpiar_terminal
+from utils import limpiar_terminal, casillas_2x2
 
 tablero = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
 
@@ -16,7 +16,6 @@ class Jugador:
             return True
         else:
             return False
-
 
     def realizar_accion(self) -> str:
 
@@ -112,7 +111,37 @@ class Jugador:
             pos_init.append(pos)
             personaje.posicion = pos
     def recibir_accion(self, STR: str):
-        pass
+
+        self.informe = ' -- INFORME DEL TURNO DEL ENEMIGO -- \n'
+
+        if STR == 'move':
+            self.informe += 'No se ha registrado actividad enemiga \n'
+            pass
+
+        STR = list(STR)
+
+        if STR[0] == 'I':
+            casillas_afectadas = casillas_2x2(STR)
+
+            for personaje in self.equipo:
+                if personaje.posicion in casillas_afectadas:
+                    self.informe += f'El enemigo ha avistado a {personaje.id}\n'
+
+        if STR[0] == 'A':
+            casillas_afectadas = casillas_2x2(STR)
+
+            for personaje in self.equipo:
+                if personaje.posicion in casillas_afectadas:
+                    self.informe += f'El enemigo ha dañado a {personaje.id}, [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
+
+        if STR[0] == 'F':
+            casilla_puntero = STR[1:]
+            casilla = str(casilla_puntero[0]+casilla_puntero[1])
+
+            for personaje in self.equipo:
+                if personaje.posicion == casilla:
+                    self.informe += f'El enemigo ha abatido a {personaje.id}, [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
+
 
 class Personaje:
     def __init__(self) -> None:
@@ -245,7 +274,9 @@ class Francotirador(Personaje):
                 enemigo.vida_actual = 0
                 diana.append(enemigo)
                 print(f'{enemigo.id} ha caído!')
+                return f'{self.id[0]}{posicion}'
         if not diana:
+            return 'move'
             print(f'No se ha matado a ningún enemigo en {posicion}')
 
 class Artillero(Personaje):
