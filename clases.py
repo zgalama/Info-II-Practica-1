@@ -114,6 +114,7 @@ class Jugador:
 
         self.informe = ' -- INFORME DEL TURNO DEL ENEMIGO -- \n'
 
+
         if STR == 'move':
             self.informe += 'No se ha registrado actividad enemiga \n'
             pass
