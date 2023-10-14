@@ -35,40 +35,43 @@ class Jugador:
                 print(f'{i + 1}: Curar a un personaje')
                 opciones_personajes.append({i : personaje.id})
                 opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(i)
-                opciones_validas.append(i + 1)
+                opciones_validas.append(str(i))
+                opciones_validas.append(str(i + 1))
 
             if personaje.id == 'Inteligencia':
                 print(f'{i}: Mover a Inteligencia')
                 print(f'{i + 1}: Explorar un área 2x2')
                 opciones_personajes.append({i : personaje.id})
                 opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(i)
-                opciones_validas.append(i + 1)
+                opciones_validas.append(str(i))
+                opciones_validas.append(str(i + 1))
 
             if personaje.id == 'Artillero':
                 print(f'{i}: Mover al artillero')
                 print(f'{i + 1}: Atacar en un area 2x2')
                 opciones_personajes.append({i : personaje.id})
                 opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(i)
-                opciones_validas.append(i + 1)
+                opciones_validas.append(str(i))
+                opciones_validas.append(str(i + 1))
 
             if personaje.id == 'Francotirador':
                 print(f'{i}: Mover al Francotirador')
                 print(f'{i + 1}: Atacar hacia una posición')
                 opciones_personajes.append({i : personaje.id})
                 opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(i)
-                opciones_validas.append(i + 1)
+                opciones_validas.append(str(i))
+                opciones_validas.append(str(i + 1))
 
             i = i + 2
 
         print('')
 
-        num_accion = int(input('Selecciona la acción siguiente: '))
+        num_accion = (input('Selecciona la acción siguiente: '))
+
         while num_accion not in opciones_validas:
-            num_accion = int(input('Opcion no válida, introduzca de nuevo la acción: '))
+            num_accion = (input('Opcion no válida, introduzca de nuevo la acción: '))
+
+        num_accion = int(num_accion)
 
         if (num_accion + 2) % 2 == 0:
             id_personaje = opciones_personajes[num_accion][num_accion]
@@ -79,7 +82,7 @@ class Jugador:
             id_personaje = opciones_personajes[num_accion][num_accion]
             for personaje in self.equipo:
                 if id_personaje == personaje.id:
-                    personaje.habilidad()
+                    personaje.habilidad(self.oponente)
 
     def crear_equipo(self):
         M = Medico()
@@ -149,7 +152,7 @@ class Medico(Personaje):
         self.vida_maxima = 1
         self.vida_actual = 1
 
-    def habilidad(self) -> None:
+    def habilidad(self, opo : Jugador) -> None:
         opciones_validas = ['M','I','A','F']
         objetivos_a_curar = []
         for objetivo in self.equipo:
@@ -231,6 +234,7 @@ class Francotirador(Personaje):
         for enemigo in equipo_enemigo:
             if enemigo.posicion == posicion:
                 enemigo.vida_actual = 0
+                print(f'{enemigo.id} ha caído!')
 
 class Artillero(Personaje):
     def __init__(self):
@@ -239,9 +243,15 @@ class Artillero(Personaje):
         self.vida_maxima = 2
         self.vida_actual = 2
 
-    def habilidad(self, posicion : str, opo : Jugador):
+    def habilidad(self, opo : Jugador):
         letras_casillas = ('a', 'b', 'c', 'd')
         numeros_casillas = ('1', '2', '3', '4')
+
+        posicion = input('Selecciona la casilla superior izquierda del area 2x2 que quieres atacar: ')
+        posiciones_validas = ['a1','a2','a3','b1','b2','b3','c1', 'c2', 'c3']
+
+        while posicion not in posiciones_validas:
+            posicion = input('Selecciona una casilla valida que abarque un area 2x2:  ')
 
         casillas_exploradas = [posicion]
 
