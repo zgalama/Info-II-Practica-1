@@ -17,22 +17,8 @@ class Jugador:
 
     def realizar_accion(self) -> str:
         num_accion = int(input('Selecciona la acción siguiente: '))
-        if num_accion == 1:
-            self.equipo[0].mover()
-        elif num_accion == 2:
-            self.equipo[0].habilidad()
-        elif num_accion == 3:
-            self.equipo[1].mover()
-        elif num_accion == 4:
-            self.equipo[1].habilidad(self.oponente)
-        elif num_accion == 5:
-            self.equipo[2].mover()
-        elif num_accion == 6:
-            self.equipo[2].habilidad()
-        elif num_accion == 7:
-            self.equipo[3].mover()
-        elif num_accion == 8:
-            self.equipo[3].habilidad(self.oponente)
+
+
 
 
     def crear_equipo(self):
