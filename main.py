@@ -27,6 +27,8 @@ def main():
     while not final:
 
         input('Turno del Jugador 1. Pulsa intro para comenzar')
+        limpiar_terminal()
+
         eliminar_personajes_muertos(j1.equipo)
         final = j1.turno()
         if final:
@@ -37,10 +39,11 @@ def main():
 
 
         input('Jugador 1, pulsa intro para terminar tu turno')
-
         limpiar_terminal()
 
         input('Turno del Jugador 2. Pulsa intro para comenzar')
+        limpiar_terminal()
+
         eliminar_personajes_muertos(j2.equipo)
         final = j2.turno()
         if final:

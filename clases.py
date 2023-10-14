@@ -16,10 +16,70 @@ class Jugador:
                 return False
 
     def realizar_accion(self) -> str:
+
+        opciones_personajes = []
+        opciones_validas = []
+
+        print('-- SITUACION DEL EQUIPO --')
+
+        for personaje in self.equipo:
+            print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}]')
+
+        print('-- Selecciona una acción --')
+
+        i = 0
+        for personaje in self.equipo:
+
+            if personaje.id == 'Medico':
+                print(f'{i}: Mover al médico')
+                print(f'{i + 1}: Curar a un personaje')
+                opciones_personajes.append({i : personaje.id})
+                opciones_personajes.append({i + 1: personaje.id})
+                opciones_validas.append(i)
+                opciones_validas.append(i + 1)
+
+            if personaje.id == 'Inteligencia':
+                print(f'{i}: Mover a Inteligencia')
+                print(f'{i + 1}: Explorar un área 2x2')
+                opciones_personajes.append({i : personaje.id})
+                opciones_personajes.append({i + 1: personaje.id})
+                opciones_validas.append(i)
+                opciones_validas.append(i + 1)
+
+            if personaje.id == 'Artillero':
+                print(f'{i}: Mover al artillero')
+                print(f'{i + 1}: Atacar en un area 2x2')
+                opciones_personajes.append({i : personaje.id})
+                opciones_personajes.append({i + 1: personaje.id})
+                opciones_validas.append(i)
+                opciones_validas.append(i + 1)
+
+            if personaje.id == 'Francotirador':
+                print(f'{i}: Mover al Francotirador')
+                print(f'{i + 1}: Atacar hacia una posición')
+                opciones_personajes.append({i : personaje.id})
+                opciones_personajes.append({i + 1: personaje.id})
+                opciones_validas.append(i)
+                opciones_validas.append(i + 1)
+
+            i = i + 2
+
+        print('')
+
         num_accion = int(input('Selecciona la acción siguiente: '))
+        while num_accion not in opciones_validas:
+            num_accion = int(input('Opcion no válida, introduzca de nuevo la acción: '))
 
-
-
+        if (num_accion + 2) % 2 == 0:
+            id_personaje = opciones_personajes[num_accion][num_accion]
+            for personaje in self.equipo:
+                if id_personaje == personaje.id:
+                    personaje.mover()
+        else:
+            id_personaje = opciones_personajes[num_accion][num_accion]
+            for personaje in self.equipo:
+                if id_personaje == personaje.id:
+                    personaje.habilidad()
 
     def crear_equipo(self):
         M = Medico()
@@ -57,7 +117,6 @@ class Personaje:
 
     def mover(self) -> None:
 
-
         pos_ocupadas = []
         pos_actual = self.posicion
 
@@ -90,7 +149,22 @@ class Medico(Personaje):
         self.vida_maxima = 1
         self.vida_actual = 1
 
-    def habilidad(self, objetivo: Personaje) -> None:
+    def habilidad(self) -> None:
+        opciones_validas = ['M','I','A','F']
+        objetivos_a_curar = []
+        for objetivo in self.equipo:
+            if objetivo.vida_actual != objetivo.vida_maxima:
+                objetivos_a_curar.append(objetivo.id[0])
+                print(f'{objetivo.id[0]}: Curar al {objetivo.id}')
+        if not objetivos_a_curar:
+            print('No hay objetivos a los que curar, perdiste el turno')
+            return
+
+        objetivo = input('A quien quieres curar: ')
+
+        while objetivo not in objetivos_a_curar:
+            objetivo = input('Selecciona una opción válida: ')
+
         objetivo.vida_actual = objetivo.vida_maxima
         print('Se ha curado al completo a {}, su salud ahora es {}\n'.format(objetivo.id, objetivo.vida_actual))
 
@@ -197,6 +271,8 @@ class Artillero(Personaje):
 
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
+
+#-- PRUEBAS
 
 
 
