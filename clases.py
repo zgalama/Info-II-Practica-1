@@ -22,12 +22,14 @@ class Jugador:
         opciones_personajes = []
         opciones_validas = []
 
-        print('-- SITUACION DEL EQUIPO --')
+        print('-- SITUACION DEL EQUIPO --\n')
 
         for personaje in self.equipo:
             print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}]')
 
-        print('-- Selecciona una acción --')
+        print('')
+
+        print('-- Selecciona una acción --\n')
 
         i = 0
         for personaje in self.equipo:
@@ -112,12 +114,13 @@ class Jugador:
             personaje.posicion = pos
     def recibir_accion(self, STR: str):
 
-        self.informe = ' -- INFORME DEL TURNO DEL ENEMIGO -- \n'
+        self.informe = '-- INFORME DEL TURNO DEL ENEMIGO -- \n'
+        self.informe += ''
 
 
         if STR == 'move':
             self.informe += 'No se ha registrado actividad enemiga \n'
-            pass
+
 
         STR = list(STR)
 
@@ -277,8 +280,8 @@ class Francotirador(Personaje):
                 print(f'{enemigo.id} ha caído!')
                 return f'{self.id[0]}{posicion}'
         if not diana:
-            return 'move'
             print(f'No se ha matado a ningún enemigo en {posicion}')
+            return 'move'
 
 class Artillero(Personaje):
     def __init__(self):
@@ -325,6 +328,9 @@ class Artillero(Personaje):
 
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
+            return 'move'
+
+        return f'A{posicion[0]}{posicion[1]}'
 
 #-- PRUEBAS
 

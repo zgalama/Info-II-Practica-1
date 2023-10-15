@@ -5,20 +5,22 @@ def main():
 
     print('')
 
-    print('Bienvenidos a Tactical Battle. A jugar! \n')
+    print(' -- Bienvenidos a TACTICAL BATTLE -- \n')
 
-    input('Turno del Jugador 1. Pulsa intro para comenzar ')
+    input('Turno del Jugador 1. Pulsa intro para comenzar\n ')
     j1 = Jugador()
     j1.crear_equipo()
     j1.posicionar_equipo()
-    input('Jugador 1, pulsa intro para terminar tu turno ')
+    print('')
+    input('Jugador 1, pulsa intro para terminar tu turno\n ')
     limpiar_terminal()
 
-    input('Turno del Jugador 2. Pulsa intro para comenzar ')
+    input('Turno del Jugador 2. Pulsa intro para comenzar\n ')
     j2 = Jugador()
     j2.crear_equipo()
     j2.posicionar_equipo()
-    input('Jugador 2, pulsa intro para terminar tu turno ')
+    print('')
+    input('Jugador 2, pulsa intro para terminar tu turno\n ')
     limpiar_terminal()
 
     j1.oponente = j2
@@ -26,18 +28,17 @@ def main():
 
     final = False
 
-    input('Turno del Jugador 1. Pulsa intro para comenzar ')
+    input('Turno del Jugador 1. Pulsa intro para comenzar\n ')
 
     while not final:
 
         #-- TURNO JUGADOR 1
 
-        limpiar_terminal()
-
         str1 = j1.realizar_accion()
+        print('')
         j2.recibir_accion(str1)
 
-        input('Jugador 1, pulsa intro para terminar tu turno ')
+        input('Jugador 1, pulsa intro para terminar tu turno\n ')
         limpiar_terminal()
 
         #-- TURNO JUGADOR 2
@@ -48,14 +49,17 @@ def main():
             print(" ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ")
             return 0
 
-        input('Turno del Jugador 2. Pulsa intro para comenzar ')
-        print(j2.informe)
         limpiar_terminal()
 
+        input('Turno del Jugador 2. Pulsa intro para comenzar\n ')
+        print(j2.informe)
+
+
         str2 = j2.realizar_accion()
+        print('')
         j1.recibir_accion(str2)
 
-        input('Jugador 2, pulsa intro para terminar tu turno ')
+        input('Jugador 2, pulsa intro para terminar tu turno\n ')
 
         limpiar_terminal()
 
@@ -65,7 +69,10 @@ def main():
             print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
             return 0
 
-        input('Turno del Jugador 1. Pulsa intro para comenzar ')
+        #-- TURNO JUGADOR 1
+
+        limpiar_terminal()
+        input('Turno del Jugador 1. Pulsa intro para comenzar\n ')
         print(j1.informe)
 
 if __name__ == '__main__':
