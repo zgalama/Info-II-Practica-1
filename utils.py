@@ -25,4 +25,7 @@ def casillas_2x2(STR):
 
     return casillas_afectadas
 
+def pertenencia_a_jugador(equipo : list, j):
+    for personaje in equipo:
+        personaje.jugador = j
 

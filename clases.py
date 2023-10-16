@@ -17,6 +17,11 @@ class Jugador:
         else:
             return False
 
+    def eliminar_personajes_muertos(self):
+        for personaje in self.equipo:
+            if personaje.vida_actual == 0:
+                self.equipo.remove(personaje)
+
     def realizar_accion(self) -> str:
 
         opciones_personajes = []
@@ -112,9 +117,11 @@ class Jugador:
                 if personaje.id == opciones_personajes[num_accion][num_accion][0]:
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
+                        self.control_de_enfriamiento()
                         return res
                     else:
                         res = personaje.habilidad(self.oponente)
+                        self.control_de_enfriamiento()
                         return res
 
     def crear_equipo(self):
@@ -173,8 +180,13 @@ class Jugador:
                     self.informe += f'El enemigo ha abatido a {personaje.id}, [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
     def resetear_enfriamiento(self):
         for personaje in self.equipo:
-            if personaje.enfriamiento_restante == 2:
+            if personaje.count == 2:
                 personaje.enfriamiento_restante = 0
+
+    def control_de_enfriamiento(self):
+        for personaje in self.equipo:
+            if personaje.enfriamiento_restante == 1:
+                personaje.count += 1
 
 class Personaje:
     def __init__(self) -> None:
@@ -183,7 +195,9 @@ class Personaje:
         self.danyo = int
         self.posicion = str
         self.enfriamiento_restante = 0
+        self.count = 0
         self.equipo = list()
+        self.jugador = Jugador
 
     def mover(self):
 
@@ -222,7 +236,7 @@ class Medico(Personaje):
     def habilidad(self, opo : Jugador):
         opciones_validas = ['M','I','A','F']
         objetivos_a_curar = []
-        for objetivo in self.equipo:
+        for objetivo in self.jugador.equipo:
             if objetivo.vida_actual != objetivo.vida_maxima:
                 objetivos_a_curar.append(objetivo.id[0])
                 print(f'{objetivo.id[0]}: Curar al {objetivo.id}')
