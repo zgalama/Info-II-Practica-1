@@ -25,7 +25,12 @@ class Jugador:
         print('-- SITUACION DEL EQUIPO --\n')
 
         for personaje in self.equipo:
-            print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}]')
+
+            if personaje.enfriamiento_restante != 0:
+                print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}] [Habilidad no disponible]')
+            else:
+                print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}]')
+
 
         print('')
 
@@ -35,38 +40,64 @@ class Jugador:
         for personaje in self.equipo:
 
             if personaje.id == 'Medico':
-                print(f'{i}: Mover al médico')
-                print(f'{i + 1}: Curar a un personaje')
-                opciones_personajes.append({i : personaje.id})
-                opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(str(i))
-                opciones_validas.append(str(i + 1))
+                if personaje.enfriamiento_restante == 0:
+                    print(f'{i}: Mover ({personaje.id})')
+                    print(f'{i + 1}: Curar a un personaje ({personaje.id})')
+                    opciones_personajes.append({i : personaje.id})
+                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_validas.append(str(i))
+                    opciones_validas.append(str(i + 1))
+                    i += 2
+                else:
+                    print(f'{i}: Mover ({personaje.id})')
+                    opciones_personajes.append({i: personaje.id})
+                    opciones_validas.append(str(i))
+                    i += 1
 
             if personaje.id == 'Inteligencia':
-                print(f'{i}: Mover a Inteligencia')
-                print(f'{i + 1}: Explorar un área 2x2')
-                opciones_personajes.append({i : personaje.id})
-                opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(str(i))
-                opciones_validas.append(str(i + 1))
+                if personaje.enfriamiento_restante == 0:
+                    print(f'{i}: Mover ({personaje.id})')
+                    print(f'{i + 1}: Explorar un área 2x2 ({personaje.id})')
+                    opciones_personajes.append({i : personaje.id})
+                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_validas.append(str(i))
+                    opciones_validas.append(str(i + 1))
+                    i += 2
+                else:
+                    print(f'{i}: Mover ({personaje.id})')
+                    opciones_personajes.append({i: personaje.id})
+                    opciones_validas.append(str(i))
+                    i += 1
 
             if personaje.id == 'Artillero':
-                print(f'{i}: Mover al artillero')
-                print(f'{i + 1}: Atacar en un area 2x2')
-                opciones_personajes.append({i : personaje.id})
-                opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(str(i))
-                opciones_validas.append(str(i + 1))
+                if personaje.enfriamiento_restante == 0:
+                    print(f'{i}: Mover ({personaje.id})')
+                    print(f'{i + 1}: Atacar en un area 2x2 ({personaje.id})')
+                    opciones_personajes.append({i : personaje.id})
+                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_validas.append(str(i))
+                    opciones_validas.append(str(i + 1))
+                    i += 2
+                else:
+                    print(f'{i}: Mover ({personaje.id})')
+                    opciones_personajes.append({i: personaje.id})
+                    opciones_validas.append(str(i))
+                    i += 1
 
             if personaje.id == 'Francotirador':
-                print(f'{i}: Mover al Francotirador')
-                print(f'{i + 1}: Atacar hacia una posición')
-                opciones_personajes.append({i : personaje.id})
-                opciones_personajes.append({i + 1: personaje.id})
-                opciones_validas.append(str(i))
-                opciones_validas.append(str(i + 1))
-
-            i = i + 2
+                if personaje.enfriamiento_restante == 0:
+                    print(f'{i}: Mover ({personaje.id})')
+                    print(f'{i + 1}: Disparar a una posición ({personaje.id})')
+                    opciones_personajes.append({i : personaje.id})
+                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_validas.append(str(i))
+                    opciones_validas.append(str(i + 1))
+                    i += 2
+                else:
+                    print(f'{i}: Mover ({personaje.id})')
+                    opciones_personajes.append({i: personaje.id})
+                    opciones_validas.append(str(i))
+                    i += 1
 
         print('')
 
@@ -145,7 +176,10 @@ class Jugador:
             for personaje in self.equipo:
                 if personaje.posicion == casilla:
                     self.informe += f'El enemigo ha abatido a {personaje.id}, [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
-
+    def resetear_enfriamiento(self):
+        for personaje in self.equipo:
+            if personaje.enfriamiento_restante == 2:
+                personaje.enfriamiento_restante = 0
 
 class Personaje:
     def __init__(self) -> None:
@@ -153,7 +187,7 @@ class Personaje:
         self.vida_actual = int
         self.danyo = int
         self.posicion = str
-        self.enfriamiento_restante = int
+        self.enfriamiento_restante = 0
         self.equipo = list()
 
     def mover(self) -> None:
@@ -191,7 +225,7 @@ class Medico(Personaje):
         self.vida_maxima = 1
         self.vida_actual = 1
 
-    def habilidad(self, opo : Jugador) -> None:
+    def habilidad(self, opo : Jugador):
         opciones_validas = ['M','I','A','F']
         objetivos_a_curar = []
         for objetivo in self.equipo:
@@ -200,16 +234,19 @@ class Medico(Personaje):
                 print(f'{objetivo.id[0]}: Curar al {objetivo.id}')
         if not objetivos_a_curar:
             print('No hay objetivos a los que curar, perdiste el turno')
-            return
+            return 'move'
 
         objetivo = input('A quien quieres curar: ')
 
         while objetivo not in objetivos_a_curar:
             objetivo = input('Selecciona una opción válida: ')
 
-        objetivo.vida_actual = objetivo.vida_maxima
-        print('Se ha curado al completo a {}, su salud ahora es {}\n'.format(objetivo.id, objetivo.vida_actual))
-
+        for personaje in opo.equipo:
+            if objetivo == personaje.id[0]:
+                personaje.vida_actual = personaje.vida_maxima
+                print('Se ha curado al completo a {}, su salud ahora es {}/{}\n'.format(personaje.id, personaje.vida_actual, personaje.vida_maxima))
+                self.enfriamiento_restante += 1
+                return 'move'
 
 class Inteligencia(Personaje):
     def __init__(self) -> None:
@@ -256,6 +293,8 @@ class Inteligencia(Personaje):
                 print(ene, 'en', pos)
             print('\n')
 
+        self.enfriamiento_restante += 1
+
         return f'I{posicion[0]}{posicion[1]}'
 
 class Francotirador(Personaje):
@@ -278,9 +317,11 @@ class Francotirador(Personaje):
                 enemigo.vida_actual = 0
                 diana.append(enemigo)
                 print(f'{enemigo.id} ha caído!')
+                self.enfriamiento_restante += 1
                 return f'{self.id[0]}{posicion}'
         if not diana:
             print(f'No se ha matado a ningún enemigo en {posicion}')
+            self.enfriamiento_restante += 1
             return 'move'
 
 class Artillero(Personaje):
@@ -328,8 +369,10 @@ class Artillero(Personaje):
 
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
+            self.enfriamiento_restante += 1
             return 'move'
 
+        self.enfriamiento_restante += 1
         return f'A{posicion[0]}{posicion[1]}'
 
 #-- PRUEBAS

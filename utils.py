@@ -24,3 +24,4 @@ def casillas_2x2(STR):
     casillas_afectadas.append(c4)
 
     return casillas_afectadas
+
