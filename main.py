@@ -36,8 +36,6 @@ def main():
 
         #-- TURNO JUGADOR 1
 
-        j1.resetear_enfriamiento()
-
         str1 = j1.realizar_accion()
         print('')
         j2.recibir_accion(str1)
@@ -57,8 +55,6 @@ def main():
 
         input(' - Turno del Jugador 2. Pulsa intro para comenzar\n ')
         print(j2.informe)
-
-        j2.resetear_enfriamiento()
 
         str2 = j2.realizar_accion()
         print('')

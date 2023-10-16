@@ -120,10 +120,12 @@ class Jugador:
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
                         self.control_de_enfriamiento()
+                        self.resetear_enfriamiento()
                         return res
                     else:
                         res = personaje.habilidad(self.oponente)
                         self.control_de_enfriamiento()
+                        self.resetear_enfriamiento()
                         return res
 
     def crear_equipo(self):
