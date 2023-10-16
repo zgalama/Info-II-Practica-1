@@ -20,7 +20,9 @@ class Jugador:
     def eliminar_personajes_muertos(self):
         for personaje in self.equipo:
             if personaje.vida_actual == 0:
-                self.equipo.remove(personaje)
+                self.equipo[self.equipo.index(personaje)] = 0
+        self.equipo = [x for x in self.equipo if x!= 0]
+
 
     def realizar_accion(self) -> str:
 
