@@ -31,6 +31,8 @@ class Jugador:
 
         print('-- SITUACION DEL EQUIPO --\n')
 
+        self.resetear_enfriamiento()
+
         for personaje in self.equipo:
 
             if personaje.enfriamiento_restante != 0:
@@ -42,6 +44,8 @@ class Jugador:
         print('')
 
         print('-- Selecciona una acción --\n')
+
+
 
         i = 0
         for personaje in self.equipo:
@@ -119,13 +123,13 @@ class Jugador:
                 if personaje.id == opciones_personajes[num_accion][num_accion][0]:
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
+
                         self.control_de_enfriamiento()
-                        self.resetear_enfriamiento()
                         return res
                     else:
                         res = personaje.habilidad(self.oponente)
+
                         self.control_de_enfriamiento()
-                        self.resetear_enfriamiento()
                         return res
 
     def crear_equipo(self):

@@ -36,6 +36,7 @@ def main():
 
         #-- TURNO JUGADOR 1
 
+
         str1 = j1.realizar_accion()
         print('')
         j2.recibir_accion(str1)
