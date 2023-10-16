@@ -43,14 +43,14 @@ class Jugador:
                 if personaje.enfriamiento_restante == 0:
                     print(f'{i}: Mover ({personaje.id})')
                     print(f'{i + 1}: Curar a un personaje ({personaje.id})')
-                    opciones_personajes.append({i : personaje.id})
-                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_personajes.append({i : [personaje.id, 'm']})
+                    opciones_personajes.append({i + 1: [personaje.id, 'h']})
                     opciones_validas.append(str(i))
                     opciones_validas.append(str(i + 1))
                     i += 2
                 else:
                     print(f'{i}: Mover ({personaje.id})')
-                    opciones_personajes.append({i: personaje.id})
+                    opciones_personajes.append({i : [personaje.id, 'm']})
                     opciones_validas.append(str(i))
                     i += 1
 
@@ -58,14 +58,14 @@ class Jugador:
                 if personaje.enfriamiento_restante == 0:
                     print(f'{i}: Mover ({personaje.id})')
                     print(f'{i + 1}: Explorar un área 2x2 ({personaje.id})')
-                    opciones_personajes.append({i : personaje.id})
-                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_personajes.append({i : [personaje.id, 'm']})
+                    opciones_personajes.append({i + 1: [personaje.id, 'h']})
                     opciones_validas.append(str(i))
                     opciones_validas.append(str(i + 1))
                     i += 2
                 else:
                     print(f'{i}: Mover ({personaje.id})')
-                    opciones_personajes.append({i: personaje.id})
+                    opciones_personajes.append({i : [personaje.id, 'm']})
                     opciones_validas.append(str(i))
                     i += 1
 
@@ -73,14 +73,14 @@ class Jugador:
                 if personaje.enfriamiento_restante == 0:
                     print(f'{i}: Mover ({personaje.id})')
                     print(f'{i + 1}: Atacar en un area 2x2 ({personaje.id})')
-                    opciones_personajes.append({i : personaje.id})
-                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_personajes.append({i: [personaje.id, 'm']})
+                    opciones_personajes.append({i + 1: [personaje.id, 'h']})
                     opciones_validas.append(str(i))
                     opciones_validas.append(str(i + 1))
                     i += 2
                 else:
                     print(f'{i}: Mover ({personaje.id})')
-                    opciones_personajes.append({i: personaje.id})
+                    opciones_personajes.append({i : [personaje.id, 'm']})
                     opciones_validas.append(str(i))
                     i += 1
 
@@ -88,14 +88,14 @@ class Jugador:
                 if personaje.enfriamiento_restante == 0:
                     print(f'{i}: Mover ({personaje.id})')
                     print(f'{i + 1}: Disparar a una posición ({personaje.id})')
-                    opciones_personajes.append({i : personaje.id})
-                    opciones_personajes.append({i + 1: personaje.id})
+                    opciones_personajes.append({i: [personaje.id, 'm']})
+                    opciones_personajes.append({i + 1: [personaje.id, 'h']})
                     opciones_validas.append(str(i))
                     opciones_validas.append(str(i + 1))
                     i += 2
                 else:
                     print(f'{i}: Mover ({personaje.id})')
-                    opciones_personajes.append({i: personaje.id})
+                    opciones_personajes.append({i : [personaje.id, 'm']})
                     opciones_validas.append(str(i))
                     i += 1
 
@@ -106,20 +106,37 @@ class Jugador:
         while num_accion not in opciones_validas:
             num_accion = (input('Opcion no válida, introduzca de nuevo la acción: '))
 
-        num_accion = int(num_accion)
-
-        if (num_accion + 2) % 2 == 0:
-            id_personaje = opciones_personajes[num_accion][num_accion]
+        if num_accion in opciones_validas:
+            num_accion = int(num_accion)
             for personaje in self.equipo:
-                if id_personaje == personaje.id:
-                    str_r = personaje.mover()
-                    return str_r
-        else:
-            id_personaje = opciones_personajes[num_accion][num_accion]
-            for personaje in self.equipo:
-                if id_personaje == personaje.id:
-                    str_r = personaje.habilidad(self.oponente)
-                    return str_r
+                if opciones_personajes[num_accion][num_accion][0] == 'Medico':
+                    if opciones_personajes[num_accion][num_accion][1] == 'm':
+                        res = personaje.mover()
+                        return res
+                    else:
+                        res = personaje.habilidad()
+                        return res
+                elif opciones_personajes[num_accion][num_accion][0] == 'Inteligencia':
+                    if opciones_personajes[num_accion][num_accion][1] == 'm':
+                        res = personaje.mover()
+                        return res
+                    else:
+                        res = personaje.habilidad()
+                        return res
+                elif opciones_personajes[num_accion][num_accion][0] == 'Artillero':
+                    if opciones_personajes[num_accion][num_accion][1] == 'm':
+                        res = personaje.mover()
+                        return res
+                    else:
+                        res = personaje.habilidad()
+                        return res
+                elif opciones_personajes[num_accion][num_accion][0] == 'Francotirador':
+                    if opciones_personajes[num_accion][num_accion][1] == 'm':
+                        res = personaje.mover()
+                        return res
+                    else:
+                        res = personaje.habilidad()
+                        return res
 
     def crear_equipo(self):
         M = Medico()
@@ -151,7 +168,6 @@ class Jugador:
 
         if STR == 'move':
             self.informe += 'No se ha registrado actividad enemiga \n'
-
 
         STR = list(STR)
 
@@ -190,7 +206,7 @@ class Personaje:
         self.enfriamiento_restante = 0
         self.equipo = list()
 
-    def mover(self) -> None:
+    def mover(self):
 
         pos_ocupadas = []
         pos_actual = self.posicion
@@ -214,7 +230,6 @@ class Personaje:
                 self.posicion = pos_nueva
                 print(f'{self.id} se ha movido a {self.posicion}')
                 return 'move'
-                break
             else:
                 print(f'La casilla no es válida')
 

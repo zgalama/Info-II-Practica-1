@@ -25,3 +25,4 @@ def casillas_2x2(STR):
 
     return casillas_afectadas
 
+
