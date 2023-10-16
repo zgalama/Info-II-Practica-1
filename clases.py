@@ -114,28 +114,28 @@ class Jugador:
                         res = personaje.mover()
                         return res
                     else:
-                        res = personaje.habilidad()
+                        res = personaje.habilidad(self.oponente)
                         return res
                 elif opciones_personajes[num_accion][num_accion][0] == 'Inteligencia':
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
                         return res
                     else:
-                        res = personaje.habilidad()
+                        res = personaje.habilidad(self.oponente)
                         return res
                 elif opciones_personajes[num_accion][num_accion][0] == 'Artillero':
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
                         return res
                     else:
-                        res = personaje.habilidad()
+                        res = personaje.habilidad(self.oponente)
                         return res
                 elif opciones_personajes[num_accion][num_accion][0] == 'Francotirador':
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
                         return res
                     else:
-                        res = personaje.habilidad()
+                        res = personaje.habilidad(self.oponente)
                         return res
 
     def crear_equipo(self):
