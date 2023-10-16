@@ -109,28 +109,7 @@ class Jugador:
         if num_accion in opciones_validas:
             num_accion = int(num_accion)
             for personaje in self.equipo:
-                if opciones_personajes[num_accion][num_accion][0] == 'Medico':
-                    if opciones_personajes[num_accion][num_accion][1] == 'm':
-                        res = personaje.mover()
-                        return res
-                    else:
-                        res = personaje.habilidad(self.oponente)
-                        return res
-                elif opciones_personajes[num_accion][num_accion][0] == 'Inteligencia':
-                    if opciones_personajes[num_accion][num_accion][1] == 'm':
-                        res = personaje.mover()
-                        return res
-                    else:
-                        res = personaje.habilidad(self.oponente)
-                        return res
-                elif opciones_personajes[num_accion][num_accion][0] == 'Artillero':
-                    if opciones_personajes[num_accion][num_accion][1] == 'm':
-                        res = personaje.mover()
-                        return res
-                    else:
-                        res = personaje.habilidad(self.oponente)
-                        return res
-                elif opciones_personajes[num_accion][num_accion][0] == 'Francotirador':
+                if personaje.id == opciones_personajes[num_accion][num_accion][0]:
                     if opciones_personajes[num_accion][num_accion][1] == 'm':
                         res = personaje.mover()
                         return res
