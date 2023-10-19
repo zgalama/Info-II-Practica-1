@@ -149,7 +149,7 @@ class Jugador:
 
         for personaje in self.equipo:
             pos = input(f'Escriba la posicion inicial de {personaje.id}: ')
-            while pos in pos_init or pos not in valid_pos:
+            while pos in pos_init or pos not in tablero:
                 pos = input(f'La casilla no es valida, escoja otra posicion para el {personaje.id}: ')
 
             pos_init.append(pos)
@@ -200,7 +200,6 @@ class Personaje:
     def __init__(self) -> None:
         self.vida_maxima = int
         self.vida_actual = int
-        self.danyo = int
         self.posicion = str
         self.enfriamiento_restante = 0
         self.count = 0
@@ -217,7 +216,11 @@ class Personaje:
         pos_ocupadas.append(pos_actual)
 
         while True:
+
             pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id}: ')
+            while pos_nueva == '':
+                pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id}: ')
+
             list_pos = list(pos_actual)
             list_npos = list(pos_nueva)
 
