@@ -190,6 +190,7 @@ class Jugador:
         for personaje in self.equipo:
             if personaje.count == 2:
                 personaje.enfriamiento_restante = 0
+                personaje.count = 0
 
     def control_de_enfriamiento(self):
         for personaje in self.equipo:
@@ -260,7 +261,7 @@ class Medico(Personaje):
         while objetivo not in objetivos_a_curar:
             objetivo = input('Selecciona una opción válida: ')
 
-        for personaje in opo.equipo:
+        for personaje in self.jugador.equipo:
             if objetivo == personaje.id[0]:
                 personaje.vida_actual = personaje.vida_maxima
                 print('Se ha curado al completo a {}, su salud ahora es {}/{}\n'.format(personaje.id, personaje.vida_actual, personaje.vida_maxima))
