@@ -5,7 +5,7 @@ def main():
 
     print('')
 
-    print(' -- Bienvenidos a TACTICAL BATTLE -- \n')
+    print(' -- BIENVENIDOS A TACTICAL BATTLE -- \n')
 
     input(' - Turno del Jugador 1. Pulsa intro para comenzar\n ')
     j1 = Jugador()

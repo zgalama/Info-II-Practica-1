@@ -23,6 +23,11 @@ class Jugador:
                 self.equipo[self.equipo.index(personaje)] = 0
         self.equipo = [x for x in self.equipo if x!= 0]
 
+        for personaje in self.equipo:
+            for aliado in personaje.equipo:
+                if aliado.vida_actual == 0:
+                    personaje.equipo[personaje.equipo.index(aliado)] = 0
+            personaje.equipo = [x for x in personaje.equipo if x != 0]
 
     def realizar_accion(self) -> str:
 
@@ -36,14 +41,14 @@ class Jugador:
         for personaje in self.equipo:
 
             if personaje.enfriamiento_restante != 0:
-                print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}] [Habilidad no disponible]')
+                print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}] [Habilidad no disponible este turno]')
             else:
                 print(f'El {personaje.id} se encuentra en [{personaje.posicion}] con [Vida: {personaje.vida_actual}/{personaje.vida_maxima}]')
 
 
         print('')
 
-        print('-- Selecciona una acción --\n')
+        print('-- ACCIONES DISPONIBLES --\n')
 
 
 
@@ -112,7 +117,7 @@ class Jugador:
 
         print('')
 
-        num_accion = (input('Selecciona la acción siguiente: '))
+        num_accion = (input('Selecciona una opción: '))
 
         while num_accion not in opciones_validas:
             num_accion = (input('Opcion no válida, introduzca de nuevo la acción: '))
@@ -146,6 +151,7 @@ class Jugador:
     def posicionar_equipo(self):
         pos_init = []
         valid_pos = ['a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4']
+        print('Introduce las casillas en forma de (letra + numero), [a-d (minusculas)] + [1-4], Ejemplo: a1')
 
         for personaje in self.equipo:
             pos = input(f'Escriba la posicion inicial de {personaje.id}: ')
@@ -159,7 +165,6 @@ class Jugador:
         self.informe = '-- INFORME DEL TURNO DEL ENEMIGO -- \n'
         self.informe += ''
 
-
         if STR == 'move':
             self.informe += 'No se ha registrado actividad enemiga \n'
 
@@ -170,14 +175,14 @@ class Jugador:
 
             for personaje in self.equipo:
                 if personaje.posicion in casillas_afectadas:
-                    self.informe += f'El enemigo ha avistado a {personaje.id}\n'
+                    self.informe += f'El enemigo ha avistado a {personaje.id} en [{personaje.posicion}]\n'
 
         if STR[0] == 'A':
             casillas_afectadas = casillas_2x2(STR)
 
             for personaje in self.equipo:
                 if personaje.posicion in casillas_afectadas:
-                    self.informe += f'El enemigo ha dañado a {personaje.id}, [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
+                    self.informe += f'El enemigo ha dañado a {personaje.id} en [{personaje.posicion}], Vida actual: [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
 
         if STR[0] == 'F':
             casilla_puntero = STR[1:]
@@ -185,7 +190,7 @@ class Jugador:
 
             for personaje in self.equipo:
                 if personaje.posicion == casilla:
-                    self.informe += f'El enemigo ha abatido a {personaje.id}, [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
+                    self.informe += f'El enemigo ha abatido a {personaje.id}, Vida Actual: [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
     def resetear_enfriamiento(self):
         for personaje in self.equipo:
             if personaje.count == 2:
@@ -218,9 +223,9 @@ class Personaje:
 
         while True:
 
-            pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id}: ')
+            pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id} [{self.posicion}]: ')
             while pos_nueva == '':
-                pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id}: ')
+                pos_nueva = input(f'Escribe a la casilla a la que quieres mover {self.id} [{self.posicion}]: ')
 
             list_pos = list(pos_actual)
             list_npos = list(pos_nueva)
@@ -261,9 +266,13 @@ class Medico(Personaje):
         while objetivo not in objetivos_a_curar:
             objetivo = input('Selecciona una opción válida: ')
 
+        print('')
+
         for personaje in self.jugador.equipo:
             if objetivo == personaje.id[0]:
                 personaje.vida_actual = personaje.vida_maxima
+                print('')
+                print('-- RESULTADO DE LA ACCIÓN --\n')
                 print('Se ha curado al completo a {}, su salud ahora es {}/{}\n'.format(personaje.id, personaje.vida_actual, personaje.vida_maxima))
                 self.enfriamiento_restante += 1
                 return 'move'
@@ -305,6 +314,9 @@ class Inteligencia(Personaje):
             if enemigo.posicion in casillas_exploradas:
                 avistados[enemigo.id] = enemigo.posicion
 
+        print('')
+        print('-- RESULTADO DE LA ACCIÓN --')
+
         if not avistados:
             print('No se ha avistado a ningún enemigo\n')
         else:
@@ -332,6 +344,8 @@ class Francotirador(Personaje):
         while posicion not in tablero:
             posicion = input('Esa casilla no existe, introduzca una casilla válida: ')
         equipo_enemigo = opo.equipo
+        print('')
+        print('-- RESULTADO DE LA ACCIÓN --')
         for enemigo in equipo_enemigo:
             if enemigo.posicion == posicion:
                 enemigo.vida_actual = 0
@@ -381,11 +395,14 @@ class Artillero(Personaje):
 
         dañados = {}
 
+        print('')
+        print('-- RESULTADO DE LA ACCIÓN --')
+
         for enemigo in opo.equipo:
             if enemigo.posicion in casillas_exploradas:
                 enemigo.vida_actual = enemigo.vida_actual - 1
                 dañados[enemigo.id] = enemigo.vida_actual
-                print(f'El {enemigo.id} ha sido dañado en {enemigo.posicion}. Vida restante [{enemigo.vida_actual}]')
+                print(f'El {enemigo.id} ha sido dañado en {enemigo.posicion}. Vida restante [{enemigo.vida_actual}/{enemigo.vida_maxima}]')
 
         if not dañados:
             print('No se ha dañado a ningún enemigo\n')
