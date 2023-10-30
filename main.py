@@ -1,4 +1,4 @@
-from clases import (Jugador, Personaje, Medico, Inteligencia, Francotirador, Artillero)
+from game import (Jugador, Personaje, Medico, Inteligencia, Francotirador, Artillero)
 from utils import (limpiar_terminal, eliminar_personajes_muertos,pertenencia_a_jugador)
 
 def main():
