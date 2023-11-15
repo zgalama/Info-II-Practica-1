@@ -1,5 +1,5 @@
 import socket
-from game import (Jugador)
+from p0.game import (Jugador)
 from utils_2 import print_puntos
 import time
 
