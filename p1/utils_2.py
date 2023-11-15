@@ -7,6 +7,9 @@ class Partida:
         self.sockets = [sock1, sock2]
         self.names = [n1, n2]
         self.id = id_p
+        self.equipo1 = []
+        self.equipo1 = []
+
     def tirar_moneda(self):
         moneda = tirar_moneda() # -- Para ver quien elige primero cara o cruz
 
@@ -51,8 +54,6 @@ class Partida:
 
         return turno
 
-
-
 class Server:
     def __init__(self):
         self.lobby = []
@@ -71,6 +72,10 @@ def tirar_moneda() -> int:
         return 0
     elif 0.5 <= numero_aleatorio < 1:
         return 1
+def print_puntos():
+    for i in range(3):
+        print((i+1) * '.')
+        time.sleep(1)
 
 
 

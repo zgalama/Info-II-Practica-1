@@ -1,11 +1,16 @@
 import socket
-import time
+from p1.game import (Jugador)
+from utils_2 import print_puntos
 
 cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
+    print('Conectando con el servidor')
+    print_puntos()
     cl_socket.connect(('localhost', 5454))
-    print('Conectado al Servidor')
+
+    print('-- Conectado al Servidor --\n')
+    print(' -- BIENVENIDOS A TACTICAL BATTLE -- \n')
 
     # ENV 1
 
@@ -34,14 +39,26 @@ try:
     empieza = cl_socket.recv(1024).decode()
     print('Lanzando moneda')
 
-    for i in range(3):
-        print((i+1) * '.')
-        time.sleep(1)
+    print_puntos()
 
     print('\n' + empieza)
 
+
+
+    # -- CREAR JUEGO
+
+    j = Jugador()
+    j.crear_equipo()
+
+    # -- POSICIONAR EQUIPO
+
+    j1.posicionar_equipo()
+
+
+
     while cl_socket:
         pass
+
 
 except ConnectionRefusedError:
     print('No se ha podido conectar')

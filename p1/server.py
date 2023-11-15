@@ -19,7 +19,7 @@ def conexión_entrante(cl_sock):
     if len(s.lobby) != 2:
         s.lobby.append(cl)
         if len(s.lobby) == 1:
-            cl_socket.send((f'Lobby: [{s.lobby[0]}]').encode())
+            cl_socket.send((f'Lobby: [{s.lobby[0].name}]').encode())
         else:
             cl_socket.send((f'Lobby: [{s.lobby[0].name}, {s.lobby[1].name}]').encode())
 
@@ -42,12 +42,6 @@ def start_game(cl1, cl2):
     # Seleccionar primer turno lanzando una moneda
 
     turno = p.tirar_moneda()
-
-    return turno
-
-
-
-
 
 
 
