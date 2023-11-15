@@ -53,6 +53,8 @@ class Partida:
                 self.sockets[1].send(empieza.encode())
                 turno = 0
 
+        time.sleep(2)
+
         return turno
 
 class Server:

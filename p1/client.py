@@ -45,7 +45,7 @@ try:
 
     print('\n' + empieza)
 
-    time.sleep(5)
+    time.sleep(2)
 
     turno = cl_socket.recv(1024).decode()
 
