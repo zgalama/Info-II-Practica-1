@@ -17,6 +17,15 @@ class Jugador:
         else:
             return False
 
+    def turno_online(self):
+        equipo = []
+        for personaje in self.equipo:
+            equipo.append(personaje.id)
+        if 'Artillero' not in equipo and 'Francotirador' not in equipo:
+            return True
+        else:
+            return False
+
     def eliminar_personajes_muertos(self):
         for personaje in self.equipo:
             if personaje.vida_actual == 0:

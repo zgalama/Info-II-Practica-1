@@ -1,6 +1,7 @@
 import socket
-from p1.game import (Jugador)
+from game import (Jugador)
 from utils_2 import print_puntos
+import time
 
 cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -37,13 +38,16 @@ try:
     # RECV 3
 
     empieza = cl_socket.recv(1024).decode()
+
     print('Lanzando moneda')
 
     print_puntos()
 
     print('\n' + empieza)
 
+    time.sleep(5)
 
+    turno = cl_socket.recv(1024).decode()
 
     # -- CREAR JUEGO
 
@@ -52,12 +56,50 @@ try:
 
     # -- POSICIONAR EQUIPO
 
-    j1.posicionar_equipo()
+    j.posicionar_equipo()
 
+    input('Pulsaa INTRO si estas listo')
+    cl_socket.send('Ok'.encode())
 
+    if turno == '1':
 
-    while cl_socket:
-        pass
+        while True:
+
+            str1 = j.realizar_accion()
+            print('')
+            cl_socket.send(str1.encode())
+
+            str2 = cl_socket.recv(1024).decode()
+            j.recibir_accion(str2)
+
+            j.eliminar_personajes_muertos()
+            final = j.turno_online()
+            if final:
+                print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
+                cl_socket.send('fin' + str(id_lobby))
+                break
+
+            print(j.informe)
+
+    if turno == '0':
+
+        while True:
+
+            str2 = cl_socket.recv(1024).decode()
+            j.recibir_accion(str2)
+            j.eliminar_personajes_muertos()
+            final = j.turno_online()
+            if final:
+                print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
+                cl_socket.send('fin' + str(id_lobby))
+                break
+
+            print(j.informe)
+
+            str1 = j.realizar_accion()
+            print('')
+            cl_socket.send(str1.encode())
+
 
 
 except ConnectionRefusedError:

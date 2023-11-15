@@ -1,5 +1,6 @@
 import socket
 import random
+import time
 
 
 class Partida:
