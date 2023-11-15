@@ -1,5 +1,5 @@
 from jugar import (Jugador, Personaje, Medico, Inteligencia, Francotirador, Artillero)
-from utils_me import (limpiar_terminal, eliminar_personajes_muertos, pertenencia_a_jugador)
+from utils import (limpiar_terminal, eliminar_personajes_muertos,pertenencia_a_jugador)
 import pickle
 
 def main():
