@@ -71,7 +71,6 @@ try:
     j.posicionar_equipo()
 
     input('Pulsaa INTRO si estas listo')
-    cl_socket.send('Ok'.encode())
 
     print_puntos()
 
@@ -79,11 +78,14 @@ try:
 
     ser_j = pickle.dumps(j)
     cl_socket.sendall(ser_j)
+    print('informacion sobre jugador enviada (dev)')
 
     time.sleep(1)
 
+    print('esperando informacion del oponente (dev)')
     ser_opo = cl_socket.recv(1024)
     opo = pickle.loads(ser_opo)
+    print('informacion del oponente recivida (dev)')
 
     j.oponente = opo
 
@@ -93,8 +95,10 @@ try:
 
             print('Esperando actualizacion del estado del equipo rival (dev)')
             ser_act2 = cl_socket.recv(1024)
-            act2 = pickle.loads(ser_act1)
-            j.oponente = act1
+            print('recibido')
+            act2 = pickle.loads(ser_act2)
+            j.oponente = act2
+            print('oponente actualizado')
 
             str1 = j.realizar_accion()
             print('')
@@ -122,15 +126,18 @@ try:
 
             act2 = pickle.dumps(j)
             cl_socket.sendall(act2)
+            print('act enviado')
 
-            print("Esperando acción del jugador 0...")
+            print("Esperando acción del oponente...")
             str2 = cl_socket.recv(1024).decode()
             print("Recibido:", str2)
             j.recibir_accion(str2)
 
+            print('recibiendo actualizacion de equipo (dev)')
             ser_act1 = cl_socket.recv(1024)
             act1 = pickle.loads(ser_act1)
             j.oponente = act1
+            print('oponente actualizado')
 
             j.eliminar_personajes_muertos()
             final = j.turno_online()

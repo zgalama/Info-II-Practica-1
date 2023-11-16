@@ -74,14 +74,13 @@ def start_game(cl1, cl2):
 
     # Confirmacion de que ambos han colocado su equipo
 
-    ok1 = cl1.socket.recv(1024)
-    ok2 = cl2.socket.recv(1024)
-
     time.sleep(1)
 
     ### - RECIBIR INFO DE J1 Y J2 CON PICKLE
     info_j1 = cl1.socket.recv(1024)
     info_j2 = cl2.socket.recv(1024)
+
+    time.sleep(3)
 
     opo_j1 = cl1.socket.sendall(info_j2)
     opo_j2 = cl2.socket.sendall(info_j1)
@@ -89,21 +88,24 @@ def start_game(cl1, cl2):
 
     if turno == 0:
 
+        act = cl2.socket.recv(1024)
+        cl1.socket.send(act)
+
         men = cl1.socket.recv(1024)  # Accion j1
         cl2.socket.send(men)
 
         act = cl1.socket.recv(1024)
-        cl2.socket.send(act)
+        cl1.socket.send(act)
 
         men = cl2.socket.recv(1024) # Accion j2
         cl1.socket.send(men)
 
-        act = cl2.socket.recv(1024)
-        cl1.socket.send(act)
-
         fin = False
 
         while not fin:
+
+            act = cl2.socket.recv(1024)
+            cl1.socket.send(act)
 
             men = cl1.socket.recv(1024) # Accion j1
             if men.decode() == 'fin1':
@@ -112,10 +114,7 @@ def start_game(cl1, cl2):
             cl2.socket.send(men)
 
             act = cl1.socket.recv(1024)
-            cl2.socket.send(act)
-
-            act1 = cl1.socket.recv(1024)
-            cl2.socket.send(act)
+            cl1.socket.send(act)
 
             men = cl2.socket.recv(1024)  # Accion j2
             if men.decode() == 'fin0':
@@ -123,44 +122,41 @@ def start_game(cl1, cl2):
                 break
             cl1.socket.send(men)
 
-            act = cl2.socket.recv(1024)
-            cl1.socket.send(act)
-
     if turno == 1:
-
-        men = cl1.socket.recv(1024)  # Accion j1
-        cl2.socket.send(men)
 
         act = cl1.socket.recv(1024)
         cl2.socket.send(act)
 
-        men = cl2.socket.recv(1024)  # Accion j2
+        men = cl2.socket.recv(1024)  # Accion j1
         cl1.socket.send(men)
 
         act = cl2.socket.recv(1024)
         cl1.socket.send(act)
 
+        men = cl1.socket.recv(1024)  # Accion j2
+        cl2.socket.send(men)
+
         fin = False
 
         while not fin:
 
-            men = cl1.socket.recv(1024)  # Accion j1
+            act = cl1.socket.recv(1024)
+            cl2.socket.send(act)
+
+            men = cl2.socket.recv(1024)  # Accion j1
             if men.decode() == 'fin1':
-                fin = True
-                break
-            cl2.socket.send(men)
-
-            act = cl2.socket.recv(1024)
-            cl1.socket.send(act)
-
-            men = cl2.socket.recv(1024)  # Accion j2
-            if men.decode() == 'fin0':
                 fin = True
                 break
             cl1.socket.send(men)
 
             act = cl2.socket.recv(1024)
             cl1.socket.send(act)
+
+            men = cl1.socket.recv(1024)  # Accion j2
+            if men.decode() == 'fin0':
+                fin = True
+                break
+            cl2.socket.send(men)
 
     if men == 'fin0':
         print(f'Ha ganado {p.names[0]}')
