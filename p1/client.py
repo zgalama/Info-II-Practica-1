@@ -94,7 +94,7 @@ try:
         while True:
 
             print('Esperando actualizacion del estado del equipo rival (dev)')
-            ser_act2 = cl_socket.recv(1024)
+            ser_act2 = cl_socket.recv(10000)
             print('recibido')
             act2 = pickle.loads(ser_act2)
             j.oponente = act2
@@ -134,7 +134,7 @@ try:
             j.recibir_accion(str2)
 
             print('recibiendo actualizacion de equipo (dev)')
-            ser_act1 = cl_socket.recv(1024)
+            ser_act1 = cl_socket.recv(10000)
             act1 = pickle.loads(ser_act1)
             j.oponente = act1
             print('oponente actualizado')
