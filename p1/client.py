@@ -1,7 +1,19 @@
+import pickle
 import socket
 from game import (Jugador)
 from utils_2 import print_puntos
 import time
+
+def act_oponente():
+    ser_j = pickle.dumps(j)
+    cl_socket.sendall(ser_j)
+
+    time.sleep(1)
+
+    ser_opo = cl_socket.recv(1024)
+    opo = pickle.loads(ser_opo)
+
+    j.oponente = opo
 
 cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -61,14 +73,37 @@ try:
     input('Pulsaa INTRO si estas listo')
     cl_socket.send('Ok'.encode())
 
+    print_puntos()
+
+    # -- actualizar datos con oponente
+
+    ser_j = pickle.dumps(j)
+    cl_socket.sendall(ser_j)
+
+    time.sleep(1)
+
+    ser_opo = cl_socket.recv(1024)
+    opo = pickle.loads(ser_opo)
+
+    j.oponente = opo
+
     if turno == '1':
 
         while True:
+
+            print('Esperando actualizacion del estado del equipo rival (dev)')
+            ser_act2 = cl_socket.recv(1024)
+            act2 = pickle.loads(ser_act1)
+            j.oponente = act1
 
             str1 = j.realizar_accion()
             print('')
             cl_socket.send(str1.encode())
 
+            act1 = pickle.dumps(j)
+            cl_socket.sendall(act1)
+
+            print("Esperando acción del jugador 0...")
             str2 = cl_socket.recv(1024).decode()
             j.recibir_accion(str2)
 
@@ -85,8 +120,18 @@ try:
 
         while True:
 
+            act2 = pickle.dumps(j)
+            cl_socket.sendall(act2)
+
+            print("Esperando acción del jugador 0...")
             str2 = cl_socket.recv(1024).decode()
+            print("Recibido:", str2)
             j.recibir_accion(str2)
+
+            ser_act1 = cl_socket.recv(1024)
+            act1 = pickle.loads(ser_act1)
+            j.oponente = act1
+
             j.eliminar_personajes_muertos()
             final = j.turno_online()
             if final:
