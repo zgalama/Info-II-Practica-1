@@ -115,7 +115,7 @@ try:
             final = j.turno_online()
             if final:
                 print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
-                cl_socket.send('fin' + str(id_lobby))
+                cl_socket.send('fin')
                 break
 
             print(j.informe)

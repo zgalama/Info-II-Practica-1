@@ -86,84 +86,53 @@ def start_game(cl1, cl2):
     opo_j2 = cl2.socket.sendall(info_j1)
 
 
-    if turno == 0:
-
-        act = cl2.socket.recv(1024)
-        cl1.socket.send(act)
-
-        men = cl1.socket.recv(1024)  # Accion j1
-        cl2.socket.send(men)
-
-        act = cl1.socket.recv(1024)
-        cl1.socket.send(act)
-
-        men = cl2.socket.recv(1024) # Accion j2
-        cl1.socket.send(men)
+    if turno == 0: # Si empieza jugando cl1         Lobby: [cl1,cl2]
 
         fin = False
 
         while not fin:
 
-            act = cl2.socket.recv(1024)
+            act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
             cl1.socket.send(act)
 
-            men = cl1.socket.recv(1024) # Accion j1
-            if men.decode() == 'fin1':
+            men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
+            if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
                 fin = True
                 break
             cl2.socket.send(men)
 
-            act = cl1.socket.recv(1024)
+            act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
             cl1.socket.send(act)
 
-            men = cl2.socket.recv(1024)  # Accion j2
-            if men.decode() == 'fin0':
+            men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
+            if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
                 fin = True
                 break
             cl1.socket.send(men)
 
-    if turno == 1:
-
-        act = cl1.socket.recv(1024)
-        cl2.socket.send(act)
-
-        men = cl2.socket.recv(1024)  # Accion j1
-        cl1.socket.send(men)
-
-        act = cl2.socket.recv(1024)
-        cl1.socket.send(act)
-
-        men = cl1.socket.recv(1024)  # Accion j2
-        cl2.socket.send(men)
+    if turno == 1: # Si empieza jugando cl2         Lobby: [cl1,cl2]
 
         fin = False
 
         while not fin:
 
-            act = cl1.socket.recv(1024)
+            act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
             cl2.socket.send(act)
 
-            men = cl2.socket.recv(1024)  # Accion j1
-            if men.decode() == 'fin1':
+            men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
+            if men.decode() == 'fin':
                 fin = True
                 break
             cl1.socket.send(men)
 
-            act = cl2.socket.recv(1024)
+            act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
             cl1.socket.send(act)
 
-            men = cl1.socket.recv(1024)  # Accion j2
-            if men.decode() == 'fin0':
+            men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
+            if men.decode() == 'fin':
                 fin = True
                 break
             cl2.socket.send(men)
-
-    if men == 'fin0':
-        print(f'Ha ganado {p.names[0]}')
-    elif men == 'fin1':
-        print(f'Ha ganado {p.names[1]}')
-
-
 
 
 
