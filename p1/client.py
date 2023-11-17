@@ -83,6 +83,8 @@ try:
 
     if turno == '1':
 
+        str2 = '0' # Valor inicial sin relevancio, para completar la logica de ejecucion posterior
+
         while True:
 
             print('Esperando actualizacion del estado del equipo rival (dev)')
@@ -97,6 +99,10 @@ try:
             ser_eq_recv = cl_socket.recv(3000)
             eq_recv = pickle.loads(ser_eq_recv)
             j.equipo = eq_recv
+
+            j.recibir_accion(str2)
+
+            j.eliminar_personajes_muertos()
 
             print(j.informe)
 
@@ -115,9 +121,7 @@ try:
 
             print("Esperando acción del jugador 0...")
             str2 = cl_socket.recv(8000).decode()
-            j.recibir_accion(str2)
 
-            j.eliminar_personajes_muertos()
             final = j.turno_online()
             if final:
                 print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
@@ -142,7 +146,6 @@ try:
             print("Esperando acción del oponente...")
             str2 = cl_socket.recv(8000).decode()
             print("Recibido:", str2)
-            j.recibir_accion(str2)
 
             print('recibiendo actualizacion de equipo (dev)')
             ser_act1 = cl_socket.recv(10000)
@@ -157,12 +160,15 @@ try:
             eq_recv = pickle.loads(ser_eq_recv)
             j.equipo = eq_recv
 
-            j.eliminar_personajes_muertos()
+            j.recibir_accion(str2)
+
             final = j.turno_online()
             if final:
                 print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
                 cl_socket.send('fin')
                 break
+
+            j.eliminar_personajes_muertos()
 
             print(j.informe)
 
