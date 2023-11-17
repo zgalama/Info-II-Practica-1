@@ -200,6 +200,7 @@ class Jugador:
             for personaje in self.equipo:
                 if personaje.posicion == casilla:
                     self.informe += f'El enemigo ha abatido a {personaje.id}, Vida Actual: [{personaje.vida_actual}/{personaje.vida_maxima}]\n'
+
     def resetear_enfriamiento(self):
         for personaje in self.equipo:
             if personaje.count == 2:
