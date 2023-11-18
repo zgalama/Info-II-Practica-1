@@ -104,6 +104,12 @@ try:
 
             j.eliminar_personajes_muertos()
 
+            final = j.turno_online()
+            if final:
+                print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
+                cl_socket.send('fin'.encode())
+                break
+
             print(j.informe)
 
             str1 = j.realizar_accion()
@@ -121,12 +127,6 @@ try:
 
             print("Esperando acción del jugador 0...")
             str2 = cl_socket.recv(8000).decode()
-
-            final = j.turno_online()
-            if final:
-                print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
-                cl_socket.send('fin')
-                break
 
 
     if turno == '0':
@@ -162,13 +162,13 @@ try:
 
             j.recibir_accion(str2)
 
+            j.eliminar_personajes_muertos()
+
             final = j.turno_online()
             if final:
                 print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
-                cl_socket.send('fin')
+                cl_socket.send('fin'.encode())
                 break
-
-            j.eliminar_personajes_muertos()
 
             print(j.informe)
 

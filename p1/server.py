@@ -56,9 +56,11 @@ def start_game(cl1, cl2):
 
     s.sockets.extend([cl1.socket,cl2.socket])
 
+    print('Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]')
+
     # ENV 1
 
-    mensaje_inicio = (f'Partida comenzada [{cl1.name} vs {cl2.name}]\n')
+    mensaje_inicio = (f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]\n')
     cl1.socket.send(mensaje_inicio.encode())
     cl2.socket.send(mensaje_inicio.encode())
 
@@ -159,6 +161,7 @@ def start_game(cl1, cl2):
                 break
             cl2.socket.send(men)
 
+    print('Partida finalizada')
 
 
 
@@ -180,7 +183,6 @@ def main():
             print(f'Jugador conectado: [{cl.name}]')
 
             if len(s.lobby) == 2:
-                print('Partida comenzada')
                 mi_hilo = threading.Thread(target=start_game, args=(s.lobby[0],s.lobby[1]))
                 mi_hilo.start()
             else:
