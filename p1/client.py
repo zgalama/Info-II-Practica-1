@@ -11,7 +11,7 @@ cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     print('Conectando con el servidor')
     print_puntos()
-    cl_socket.connect(('localhost', 5454))
+    cl_socket.connect(('localhost', 8888))
 
     print('-- Conectado al Servidor --\n')
     print(' -- BIENVENIDOS A TACTICAL BATTLE -- \n')

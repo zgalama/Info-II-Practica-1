@@ -9,7 +9,7 @@ id_c = 0 # -- cuando se reinicia el servidor las id empezaran desde 0
 id_p = 0
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('localhost', 5454))
+server_socket.bind(('localhost', 8888))
 
 # -- FUNCIONES DEL SERVIDOR --
 
@@ -162,10 +162,6 @@ def start_game(cl1, cl2):
             cl2.socket.send(men)
 
     print('Partida finalizada')
-
-
-
-
 
 # -- PROGRAMA SERVIDOR --
 
