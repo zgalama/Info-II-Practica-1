@@ -169,7 +169,9 @@ def start_game(cl1, cl2):
                 break
             cl2.socket.send(men)
 
-    print('Partida finalizada')
+    print(f'Partida ID:{p.id} finalizada')
+
+    
 
 
 
