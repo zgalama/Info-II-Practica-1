@@ -2,6 +2,8 @@ import pickle
 import socket
 from game import (Jugador)
 from utils_2 import print_puntos
+from utils_me import limpiar_terminal, pertenencia_a_jugador
+
 import time
 
 
@@ -9,16 +11,18 @@ cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 try:
+
     print('Conectando con el servidor')
     print_puntos()
-    cl_socket.connect(('localhost', 5454))
+    cl_socket.connect(('localhost', 8888))
 
     print('-- Conectado al Servidor --\n')
     print(' -- BIENVENIDOS A TACTICAL BATTLE -- \n')
 
     # ENV 1
 
-    cl_socket.send(input('Tu nombre: ').encode())
+    name = input('Tu nombre: ')
+    cl_socket.send(name.encode())
 
     # RECV 1
 
@@ -35,9 +39,11 @@ try:
     # ENV 2
 
     if elegir_c_cr == '1':
-        cl_socket.send(input('\nTe toca elegir primero [ 0 (cara), 1 (cruz) ]: ').encode())
+        print('\nSe lanzará una moneda para ver quien empieza')
+        cl_socket.send(input('Te toca elegir primero 0 (cara), 1 (cruz): ').encode())
     else:
-        print('\nEl rival escoge cara o cruz')
+        print('\nSe lanzará una moneda para ver quien empieza')
+        print('El rival escoge cara o cruz')
 
     # RECV 3
 
@@ -56,13 +62,15 @@ try:
     # -- CREAR JUEGO
 
     j = Jugador()
+    pertenencia_a_jugador(j.equipo,j) # Que cada personaje 'sepa' a que equipo pertenece
+    j.nombre = name
     j.crear_equipo()
 
     # -- POSICIONAR EQUIPO
 
     j.posicionar_equipo()
 
-    input('Pulsaa INTRO si estas listo')
+    input('\nPulsaa INTRO si estas listo')
 
     print_puntos()
 
@@ -70,32 +78,26 @@ try:
 
     ser_j = pickle.dumps(j)
     cl_socket.sendall(ser_j)
-    print('informacion sobre jugador enviada (dev)')
 
     time.sleep(1)
 
-    print('esperando informacion del oponente (dev)')
     ser_opo = cl_socket.recv(1024)
     opo = pickle.loads(ser_opo)
-    print('informacion del oponente recivida (dev)')
 
     j.oponente = opo
 
     if turno == '1':
 
-        str2 = '0' # Valor inicial sin relevancio, para completar la logica de ejecucion posterior
+        str2 = '0' # Valor inicial sin relevancia, para completar la logica de ejecucion posterior
 
         while True:
 
-            print('Esperando actualizacion del estado del equipo rival (dev)')
             ser_act_recv = cl_socket.recv(10000)
-            print('recibido')
             act_recv = pickle.loads(ser_act_recv)
             j.oponente = act_recv
 
             cl_socket.send('ok'.encode())
 
-            print('Recibiendo equipo actualizado')
             ser_eq_recv = cl_socket.recv(3000)
             eq_recv = pickle.loads(ser_eq_recv)
             j.equipo = eq_recv
@@ -106,7 +108,7 @@ try:
 
             final = j.turno_online()
             if final:
-                print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
+                print(f' - {j.oponente.nombre} HA GANADO LA PARTIDA! - ')
                 cl_socket.send('fin'.encode())
                 break
 
@@ -123,11 +125,13 @@ try:
 
             ser_eq_env = pickle.dumps(j.oponente.equipo)
             cl_socket.sendall(ser_eq_env)
-            print('eq enviado')
 
-            print("Esperando acción del jugador 0...")
+            print('Esperando la acción del oponente')
             str2 = cl_socket.recv(8000).decode()
-
+            limpiar_terminal()
+            if str2 == 'fin':
+                print(f' - {j.nombre} HA GANADO LA PARTIDA! - ')
+                break
 
     if turno == '0':
 
@@ -135,27 +139,25 @@ try:
 
             ser_act_env = pickle.dumps(j)
             cl_socket.sendall(ser_act_env)
-            print('act enviado')
 
             ok = cl_socket.recv(1024)
 
             ser_eq_env = pickle.dumps(j.oponente.equipo)
             cl_socket.sendall(ser_eq_env)
-            print('eq enviado')
-            
-            print("Esperando acción del oponente...")
-            str2 = cl_socket.recv(8000).decode()
-            print("Recibido:", str2)
 
-            print('recibiendo actualizacion de equipo (dev)')
+            print('Esperando la acción del oponente')
+            str2 = cl_socket.recv(8000).decode()
+            limpiar_terminal()
+            if str2 == 'fin':
+                print(f' - {j.nombre} HA GANADO LA PARTIDA! - ')
+                break
+
             ser_act1 = cl_socket.recv(10000)
             act1 = pickle.loads(ser_act1)
             j.oponente = act1
-            print('oponente actualizado')
 
             cl_socket.send('ok'.encode())
 
-            print('Recibiendo equipo actualizado')
             ser_eq_recv = cl_socket.recv(3000)
             eq_recv = pickle.loads(ser_eq_recv)
             j.equipo = eq_recv
@@ -166,7 +168,7 @@ try:
 
             final = j.turno_online()
             if final:
-                print(' ----- EL JUGADOR 1 HA GANADO LA PARTIDA! ----- ')
+                print(f' - {j.oponente.nombre} HA GANADO LA PARTIDA! - ')
                 cl_socket.send('fin'.encode())
                 break
 

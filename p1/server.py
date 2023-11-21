@@ -9,7 +9,7 @@ id_c = 0 # -- cuando se reinicia el servidor las id empezaran desde 0
 id_p = 0
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('localhost', 5454))
+server_socket.bind(('localhost', 8888))
 
 # -- FUNCIONES DEL SERVIDOR --
 
@@ -56,7 +56,7 @@ def start_game(cl1, cl2):
 
     s.sockets.extend([cl1.socket,cl2.socket])
 
-    print('Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]')
+    print(f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]')
 
     # ENV 1
 
@@ -107,6 +107,8 @@ def start_game(cl1, cl2):
             men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
             if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
                 fin = True
+                fin_msg = 'fin'
+                cl2.socket.send((fin_msg).encode())
                 break
             cl2.socket.send(men)
 
@@ -122,6 +124,8 @@ def start_game(cl1, cl2):
             men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
             if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
                 fin = True
+                fin_msg = 'fin'
+                cl1.socket.send((fin_msg).encode())
                 break
             cl1.socket.send(men)
 
@@ -143,6 +147,8 @@ def start_game(cl1, cl2):
             men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
             if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
                 fin = True
+                fin_msg = 'fin'
+                cl1.socket.send((fin_msg).encode())
                 break
             cl1.socket.send(men)
 
@@ -158,13 +164,12 @@ def start_game(cl1, cl2):
             men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
             if men.decode() == 'fin':
                 fin = True
+                fin_msg = 'fin'
+                cl2.socket.send((fin_msg).encode())
                 break
             cl2.socket.send(men)
 
     print('Partida finalizada')
-
-
-
 
 
 # -- PROGRAMA SERVIDOR --
@@ -185,6 +190,7 @@ def main():
             if len(s.lobby) == 2:
                 mi_hilo = threading.Thread(target=start_game, args=(s.lobby[0],s.lobby[1]))
                 mi_hilo.start()
+                mi_hilo.join()
             else:
                 print('Esperando otro jugador...')
 

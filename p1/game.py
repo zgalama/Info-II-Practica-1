@@ -7,6 +7,7 @@ class Jugador:
         self.oponente = Jugador
         self.equipo = list()
         self.informe = str
+        self.nombre = ''
 
     def turno(self):
         oponentes = []
@@ -266,7 +267,7 @@ class Medico(Personaje):
     def habilidad(self, opo : Jugador):
         opciones_validas = ['M','I','A','F']
         objetivos_a_curar = []
-        for objetivo in self.jugador.equipo:
+        for objetivo in self.equipo:
             if objetivo.vida_actual != objetivo.vida_maxima:
                 objetivos_a_curar.append(objetivo.id[0])
                 print(f'{objetivo.id[0]}: Curar al {objetivo.id}')
