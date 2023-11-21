@@ -108,7 +108,7 @@ try:
 
             final = j.turno_online()
             if final:
-                print(f' - {j.oponente.nombre} HA GANADO LA PARTIDA! - ')
+                print(f' - {j.oponente.nombre} HA GANADO LA PARTIDA! - \n')
                 cl_socket.send('fin'.encode())
                 break
 
@@ -130,7 +130,7 @@ try:
             str2 = cl_socket.recv(8000).decode()
             limpiar_terminal()
             if str2 == 'fin':
-                print(f' - {j.nombre} HA GANADO LA PARTIDA! - ')
+                print(f' - {j.nombre} HA GANADO LA PARTIDA! - \n')
                 break
 
     if turno == '0':

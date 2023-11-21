@@ -171,12 +171,6 @@ def start_game(cl1, cl2):
 
     print(f'Partida ID:{p.id} finalizada')
 
-    
-
-
-
-
-
 # -- PROGRAMA SERVIDOR --
 
 def main():
