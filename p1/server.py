@@ -4,6 +4,8 @@ import time
 
 from utils_2 import Cliente, Server, Partida, tirar_moneda
 
+# -- SERVIDOR -- #
+
 s = Server()
 id_c = 0 # -- cuando se reinicia el servidor las id empezaran desde 0
 id_p = 0
