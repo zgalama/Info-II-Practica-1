@@ -282,7 +282,7 @@ class Medico(Personaje):
 
         print('')
 
-        for personaje in self.jugador.equipo:
+        for personaje in self.equipo:
             if objetivo == personaje.id[0]:
                 personaje.vida_actual = personaje.vida_maxima
                 print('')
