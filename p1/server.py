@@ -153,7 +153,7 @@ def start_game(cl1, cl2):
             cl1.socket.send(men)
 
             act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
-            cl1.socket.send(act)        # Si el mensaje es fin, se acaba la partida
+            cl1.socket.send(act)        
 
             cl2.socket.send('ok'.encode())
 
