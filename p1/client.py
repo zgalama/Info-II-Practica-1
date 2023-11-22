@@ -1,20 +1,52 @@
 import pickle
 import socket
+import threading
+
 from game import (Jugador)
 from utils_2 import print_puntos
 from utils_me import limpiar_terminal, pertenencia_a_jugador
-
 import time
 
-
 cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cl_socket_ping = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
+def handle_connection(id):
+
+    if id == 0:
+        while True:
+            cl_socket_ping.send('ok'.encode())
+            msg = cl_socket_ping.recv(1024)
+            if msg == 'out':
+                print('El oponente ha abandonado la partida')
+                print('Cerrando programa')
+                print_puntos()
+                print('Programa cerrado')
+                cl_socket_ping.close()
+                cl_socket.close()
+            time.sleep(3)
+
+    if id == 1:
+        while True:
+            msg = cl_socket_ping.recv(1024)
+            if msg == 'out':
+                print('El oponente ha abandonado la partida')
+                print('Cerrando programa')
+                print_puntos()
+                print('Programa cerrado')
+                cl_socket_ping.close()
+                cl_socket.close()
+            time.sleep(3)
+            cl_socket_ping.send('ok'.encode())
+
+# -- Programa Cliente --
 
 try:
 
     print('Conectando con el servidor')
     print_puntos()
+
     cl_socket.connect(('localhost', 8888))
+    cl_socket_ping.connect(('localhost', 8889))
 
     print('-- Conectado al Servidor --\n')
     print(' -- BIENVENIDOS A TACTICAL BATTLE -- \n')
@@ -26,9 +58,13 @@ try:
 
     # RECV 1
 
-    lobby = cl_socket.recv(1024).decode()
+    lobby_pos = cl_socket.recv(1024).decode()
 
-    print(lobby)
+    int_lobby = int(lobby_pos)
+
+    conexion = threading.Thread(target=handle_connection, args=(int_lobby,))
+    conexion.start()
+
     comienzo = cl_socket.recv(1024).decode()
     print(comienzo)
 
@@ -177,8 +213,6 @@ try:
             str1 = j.realizar_accion()
             print('')
             cl_socket.send(str1.encode())
-
-
 
 except ConnectionRefusedError:
     print('No se ha podido conectar')

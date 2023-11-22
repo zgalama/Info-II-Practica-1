@@ -62,11 +62,13 @@ class Server:
         self.lobby = []
         self.partidas = []
         self.sockets = []
+        self.sockets_ping = []
 
 class Cliente:
-    def __init__(self, name, sck):
+    def __init__(self, name, sck, sck2):
         self.name = name
         self.socket = sck
+        self.socket_ping = sck2
         self.id = 0
 
 def tirar_moneda() -> int:
