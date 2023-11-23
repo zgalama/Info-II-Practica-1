@@ -1,7 +1,6 @@
 import pickle
 import socket
 import threading
-
 from game import (Jugador)
 from utils_2 import print_puntos
 from utils_me import limpiar_terminal, pertenencia_a_jugador
@@ -45,8 +44,8 @@ try:
     print('Conectando con el servidor')
     print_puntos()
 
-    cl_socket.connect(('localhost', 8888))
-    cl_socket_ping.connect(('localhost', 8889))
+    cl_socket.connect(('localhost', 7777))
+    cl_socket_ping.connect(('localhost', 7778))
 
     print('-- Conectado al Servidor --\n')
     print(' -- BIENVENIDOS A TACTICAL BATTLE -- \n')

@@ -12,8 +12,8 @@ id_p = 0
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket_ping =socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server_socket.bind(('localhost', 8888))
-server_socket_ping.bind(('localhost', 8889))
+server_socket.bind(('localhost', 7777))
+server_socket_ping.bind(('localhost', 7778))
 
 # -- FUNCIONES DEL SERVIDOR --
 
