@@ -82,6 +82,11 @@ def print_puntos():
         print((i+1) * '.')
         time.sleep(1)
 
+def comprobar_conexion(sock,data):
+    if not data:
+        sock.close()
+        return 'close'
+
 
 
 

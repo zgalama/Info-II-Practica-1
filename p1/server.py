@@ -1,7 +1,7 @@
 import socket
 import threading
 import time
-from utils_2 import Cliente, Server, Partida, tirar_moneda
+from utils_2 import Cliente, Server, Partida, tirar_moneda, comprobar_conexion
 
 # -- SERVIDOR -- #
 
@@ -44,9 +44,10 @@ def handle_clients(cl1, cl2):
     try:
         while True:
             data1 = cl1.socket_ping.recv(1024)
-            print('Ok cl1 recivido')
+            print('Ok cl1 recibido')
             if not data1:
                 print('cl1 desconectado')
+                print('Partida terminada')
                 cl2.socket_ping.send('out'.encode())
                 cl2.socket_ping.close()
                 break
@@ -54,17 +55,20 @@ def handle_clients(cl1, cl2):
                 cl2.socket_ping.send('ok'.encode())
 
             data2 = cl2.socket_ping.recv(1024)
-            print('Ok cl2 recivido')
+            print('Ok cl2 recibido')
             if not data2:
                 print('cl2 desconectado')
+                print('Partida terminada')
                 cl1.socket_ping.send('out'.encode())
                 cl1.socket_ping.close()
                 break
             else:
-                cl2.socket_ping.send('ok'.encode())
+                cl1.socket_ping.send('ok'.encode())
 
     except ConnectionResetError:
         pass
+
+
 
 
 # -- Funcion de ejecución del Juego para cada partida (en hilo)
@@ -72,6 +76,9 @@ def start_game(cl1, cl2):
 
     global id_p
     global s
+
+    game_conection = threading.Thread(target=handle_clients, args=(s.lobby[0],s.lobby[1]))
+    game_conection.start()
     
     s.lobby = [] # -- Vaciar el Lobby para que nuevos usuarios puedan empezar otras partidas
 
@@ -105,6 +112,7 @@ def start_game(cl1, cl2):
 
     ### - RECIBIR INFO DE J1 Y J2 CON PICKLE
     info_j1 = cl1.socket.recv(1024)
+
     info_j2 = cl2.socket.recv(1024)
 
     time.sleep(3)
@@ -214,15 +222,16 @@ def main():
 
             if len(s.lobby) == 2:
                 game = threading.Thread(target=start_game, args=(s.lobby[0],s.lobby[1]))
-                game_conection = threading.Thread(target=handle_clients, args=(s.lobby[0],s.lobby[1]))
                 game.start()
-                game_conection.start()
             else:
                 print('Esperando otro jugador...')
 
         except KeyboardInterrupt:
             print(' - Servidor cerrado - ')
             break
+        
+        except:
+            print(' - Servidor cerrado - ')
 
     # -- Cerrar servidor --
 
