@@ -12,39 +12,44 @@ cl_socket_ping = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 connection = True
 
-# - No nos da tiempo a gestionar todos los errores posibles -
+# - No nos dio tiempo a gestionar todos los errores posibles, cuando espera una accion o espera las casillas iniciales y se desconecta el oponente, tienes que acabar de introducir para que gestione la desconexion -
 
 def handle_connection(id):
 
     global connection
 
-    if id == 0:
+    try:
+        if id == 0:
 
-        while True:
-            cl_socket_ping.send('ok'.encode())
-            msg = cl_socket_ping.recv(1024)
-            if msg.decode() == 'out':
-                print('El oponente ha abandonado la partida')
-                print('Cerrando programa')
-                print_puntos()
-                print('Programa cerrado')
-                break
-            time.sleep(2)
+            while True:
+                cl_socket_ping.send('ok'.encode())
+                msg = cl_socket_ping.recv(1024)
+                if msg.decode() == 'out':
+                    print('Cerrando programa')
+                    print_puntos()
+                    print('Programa cerrado')
+                    break
+                time.sleep(2)
 
-    if id == 1:
+        if id == 1:
 
-        while True:
-            msg = cl_socket_ping.recv(1024)
-            if msg.decode() == 'out':
-                print('El oponente ha abandonado la partida')
-                print('Cerrando programa')
-                print_puntos()
-                print('Programa cerrado')
-                break
-            time.sleep(2)
-            cl_socket_ping.send('ok'.encode())
+            while True:
+                msg = cl_socket_ping.recv(1024)
+                if msg.decode() == 'out':
+                    print('Cerrando programa')
+                    print_puntos()
+                    print('Programa cerrado')
+                    break
+                time.sleep(2)
+                cl_socket_ping.send('ok'.encode())
     
-    connection = False
+        connection = False
+
+    except OSError:
+        print('Cerrando conexiones')
+
+    except KeyboardInterrupt:
+        pass
         
 # -- Programa Cliente --
 if connection:
@@ -73,6 +78,8 @@ if connection:
 
         conexion = threading.Thread(target=handle_connection, args=(int_lobby,))
         conexion.start()
+
+        print('Esperando oponente')
 
         comienzo = cl_socket.recv(1024).decode()
         print(comienzo)
@@ -229,9 +236,17 @@ if connection:
     except ConnectionResetError:
         print('La conexión se cerró desde el lado del servidor')
 
+    except KeyboardInterrupt:
+        pass
+
+    except EOFError:
+        print('Se perdió la conexion con el oponente')
+
     finally:
         print('Programa cerrado')
         cl_socket.close()
+        cl_socket_ping.close()
+
 
 
 

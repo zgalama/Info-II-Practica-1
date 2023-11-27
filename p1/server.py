@@ -39,28 +39,31 @@ def conexión_entrante(cl_sock,cl_sock_ping):
 
     return cl
 
+# - Funcion echo con clientes, hilo utilizando otro socket para enviar mensajes que verifiquen la conexion
 
-def handle_clients(cl1, cl2):
+def handle_clients(cl1, cl2, p):
     try:
         while True:
             data1 = cl1.socket_ping.recv(1024)
-            print('Ok cl1 recibido')
+
             if not data1:
-                print('cl1 desconectado')
-                print('Partida terminada')
+                print(f'{cl1.name} desconectado')
+                print(f'Partida [ID:{p.id}] terminada')
                 cl2.socket_ping.send('out'.encode())
                 cl2.socket_ping.close()
+                cl2.socket.close()
                 break
             else:
                 cl2.socket_ping.send('ok'.encode())
 
             data2 = cl2.socket_ping.recv(1024)
-            print('Ok cl2 recibido')
+
             if not data2:
-                print('cl2 desconectado')
-                print('Partida terminada')
+                print(f'{cl2.name} desconectado')
+                print(f'Partida [ID:{p.id}] terminada')
                 cl1.socket_ping.send('out'.encode())
                 cl1.socket_ping.close()
+                cl1.socket.close()
                 break
             else:
                 cl1.socket_ping.send('ok'.encode())
@@ -68,6 +71,8 @@ def handle_clients(cl1, cl2):
     except ConnectionResetError:
         pass
 
+    except OSError:
+        pass
 
 
 
@@ -77,131 +82,137 @@ def start_game(cl1, cl2):
     global id_p
     global s
 
-    game_conection = threading.Thread(target=handle_clients, args=(s.lobby[0],s.lobby[1]))
-    game_conection.start()
-    
-    s.lobby = [] # -- Vaciar el Lobby para que nuevos usuarios puedan empezar otras partidas
+    p = Partida(cl1.socket, cl2.socket, cl1.name, cl2.name, id_p)  # -- Crear un objeto partida
 
-    p = Partida(cl1.socket,cl2.socket,cl1.name,cl2.name,id_p) # -- Crear un objeto partida
-    id_p += 1 # -- Para que la siguiente partida tenga un id distinto
+    try:
 
-    s.sockets.extend([cl1.socket,cl2.socket])
+        game_conection = threading.Thread(target=handle_clients, args=(s.lobby[0],s.lobby[1], p))
+        game_conection.start()
 
-    print(f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]')
+        s.lobby = [] # -- Vaciar el Lobby para que nuevos usuarios puedan empezar otras partidas
+        id_p += 1 # -- Para que la siguiente partida tenga un id distinto
 
-    # ENV 1
+        s.sockets.extend([cl1.socket,cl2.socket])
 
-    mensaje_inicio = (f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]\n')
-    cl1.socket.send(mensaje_inicio.encode())
-    cl2.socket.send(mensaje_inicio.encode())
+        print(f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]')
 
-    time.sleep(2)
+        # ENV 1
 
-    # Seleccionar primer turno lanzando una moneda
+        mensaje_inicio = (f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]\n')
+        cl1.socket.send(mensaje_inicio.encode())
+        cl2.socket.send(mensaje_inicio.encode())
 
-    turno = p.tirar_moneda()
+        time.sleep(2)
 
-    if turno == 1:
-        cl1.socket.send(str(0).encode())
-        cl2.socket.send(str(1).encode())
-    elif turno == 0:
-        cl1.socket.send(str(1).encode())
-        cl2.socket.send(str(0).encode())
+        # Seleccionar primer turno lanzando una moneda
 
-    time.sleep(1)
+        turno = p.tirar_moneda()
 
-    ### - RECIBIR INFO DE J1 Y J2 CON PICKLE
-    info_j1 = cl1.socket.recv(1024)
+        if turno == 1:
+            cl1.socket.send(str(0).encode())
+            cl2.socket.send(str(1).encode())
+        elif turno == 0:
+            cl1.socket.send(str(1).encode())
+            cl2.socket.send(str(0).encode())
 
-    info_j2 = cl2.socket.recv(1024)
+        time.sleep(1)
 
-    time.sleep(3)
+        ### - RECIBIR INFO DE J1 Y J2 CON PICKLE
+        info_j1 = cl1.socket.recv(1024)
 
-    opo_j1 = cl1.socket.sendall(info_j2)
-    opo_j2 = cl2.socket.sendall(info_j1)
+        info_j2 = cl2.socket.recv(1024)
+
+        time.sleep(3)
+
+        opo_j1 = cl1.socket.sendall(info_j2)
+        opo_j2 = cl2.socket.sendall(info_j1)
 
 
-    if turno == 0: # Si empieza jugando cl1         Lobby: [cl1,cl2]
+        if turno == 0: # Si empieza jugando cl1         Lobby: [cl1,cl2]
 
-        fin = False
+            fin = False
 
-        while not fin:
+            while not fin:
 
-            act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
-            cl1.socket.send(act)
+                act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
+                cl1.socket.send(act)
 
-            cl2.socket.send('ok'.encode())
+                cl2.socket.send('ok'.encode())
 
-            eq = cl2.socket.recv(8000)
-            ok = cl1.socket.recv(1024)
-            cl1.socket.send(eq)
+                eq = cl2.socket.recv(8000)
+                ok = cl1.socket.recv(1024)
+                cl1.socket.send(eq)
 
-            men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
-            if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
-                fin = True
-                fin_msg = 'fin'
-                cl2.socket.send((fin_msg).encode())
-                break
-            cl2.socket.send(men)
+                men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
+                if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
+                    fin = True
+                    fin_msg = 'fin'
+                    cl2.socket.send((fin_msg).encode())
+                    break
+                cl2.socket.send(men)
 
-            act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
-            cl2.socket.send(act)
+                act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
+                cl2.socket.send(act)
 
-            cl1.socket.send('ok'.encode())
+                cl1.socket.send('ok'.encode())
 
-            eq = cl1.socket.recv(8000)
-            ok = cl2.socket.recv(1024)
-            cl2.socket.send(eq)
+                eq = cl1.socket.recv(8000)
+                ok = cl2.socket.recv(1024)
+                cl2.socket.send(eq)
 
-            men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
-            if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
-                fin = True
-                fin_msg = 'fin'
-                cl1.socket.send((fin_msg).encode())
-                break
-            cl1.socket.send(men)
+                men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
+                if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
+                    fin = True
+                    fin_msg = 'fin'
+                    cl1.socket.send((fin_msg).encode())
+                    break
+                cl1.socket.send(men)
 
-    if turno == 1: # Si empieza jugando cl2         Lobby: [cl1,cl2]
+        if turno == 1: # Si empieza jugando cl2         Lobby: [cl1,cl2]
 
-        fin = False
+            fin = False
 
-        while not fin:
+            while not fin:
 
-            act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
-            cl2.socket.send(act)
+                act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
+                cl2.socket.send(act)
 
-            cl1.socket.send('ok'.encode())
+                cl1.socket.send('ok'.encode())
 
-            eq = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
-            ok = cl2.socket.recv(1024)
-            cl2.socket.send(eq)
+                eq = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
+                ok = cl2.socket.recv(1024)
+                cl2.socket.send(eq)
 
-            men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
-            if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
-                fin = True
-                fin_msg = 'fin'
-                cl1.socket.send((fin_msg).encode())
-                break
-            cl1.socket.send(men)
+                men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
+                if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
+                    fin = True
+                    fin_msg = 'fin'
+                    cl1.socket.send((fin_msg).encode())
+                    break
+                cl1.socket.send(men)
 
-            act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
-            cl1.socket.send(act)        
+                act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
+                cl1.socket.send(act)
 
-            cl2.socket.send('ok'.encode())
+                cl2.socket.send('ok'.encode())
 
-            eq = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
-            ok = cl1.socket.recv(1024)
-            cl1.socket.send(eq)
+                eq = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
+                ok = cl1.socket.recv(1024)
+                cl1.socket.send(eq)
 
-            men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
-            if men.decode() == 'fin':
-                fin = True
-                fin_msg = 'fin'
-                cl2.socket.send((fin_msg).encode())
-                break
-            cl2.socket.send(men)
+                men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
+                if men.decode() == 'fin':
+                    fin = True
+                    fin_msg = 'fin'
+                    cl2.socket.send((fin_msg).encode())
+                    break
+                cl2.socket.send(men)
 
-    print(f'Partida ID:{p.id} finalizada')
+            print(f'Partida ID:{p.id} finalizada')
+
+    except:
+        pass
+
 
 
 # -- PROGRAMA SERVIDOR --
@@ -227,11 +238,13 @@ def main():
                 print('Esperando otro jugador...')
 
         except KeyboardInterrupt:
-            print(' - Servidor cerrado - ')
+            print(' -- Servidor cerrado -- ')
             break
         
-        except:
-            print(' - Servidor cerrado - ')
+        except OSError:
+            print(' -- Servidor cerrado -- ')
+
+
 
     # -- Cerrar servidor --
 
