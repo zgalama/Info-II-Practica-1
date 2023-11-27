@@ -12,6 +12,8 @@ cl_socket_ping = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 connection = True
 
+# - No nos da tiempo a gestionar todos los errores posibles -
+
 def handle_connection(id):
 
     global connection
@@ -44,7 +46,6 @@ def handle_connection(id):
     
     connection = False
         
-
 # -- Programa Cliente --
 if connection:
 
