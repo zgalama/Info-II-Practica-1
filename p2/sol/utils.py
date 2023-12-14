@@ -29,7 +29,6 @@ def validar_celda_contigua(celda1, celda2):
 
     return False
 
-
 def main():
     print(validar_celda_contigua('C1', 'C3'))  # False
     print(validar_celda_contigua('B2', 'C3'))  # False

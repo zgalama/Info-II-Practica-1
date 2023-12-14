@@ -4,13 +4,18 @@ import pickle
 import sys
 import threading
 
-puerto = int(sys.argv[1])
+from cola import Cola, Nodo
+
+# puerto = int(sys.argv[1])
+# max_partidas = int(sys.argv[2])
+
+puerto = 5555
+max_partidas = 1
 
 lock_lobby = threading.Lock()
 lock_partidas = threading.Lock()
 usuarios_lobby = []
 partidas = []
-
 
 class Partida:
     def __init__(self, j1, j2):
@@ -23,7 +28,6 @@ class Cliente:
         self.nombre = nombre
         self.socket = skt
 
-
 def bienvenida_usuario(clt_socket):
     global lock_lobby
     global lock_partidas
@@ -35,21 +39,35 @@ def bienvenida_usuario(clt_socket):
         return
     nombre_decoded = nombre.decode()
 
-    # Meter cliente a lobby o emparejar si hay alguien esperando
-    lock_lobby.acquire()
-    if len(usuarios_lobby) != 0:  # Alguien esperando a jugar, emparejar
-        assert len(usuarios_lobby) == 1
-        j1 = usuarios_lobby[0]
-        del usuarios_lobby[0]
-        j2 = Cliente(nombre_decoded, clt_socket)
+    if len(partidas) == max_partidas:
+        j = Cliente(nombre_decoded, clt_socket)
+        cola.encolar(j)
+    else:
+        # Meter cliente a lobby o emparejar si hay alguien esperando
+        lock_lobby.acquire()
+        if len(usuarios_lobby) != 0:  # Alguien esperando a jugar, emparejar
+            assert len(usuarios_lobby) == 1
+            j1 = usuarios_lobby[0]
+            del usuarios_lobby[0]
+            j2 = Cliente(nombre_decoded, clt_socket)
+            lock_partidas.acquire()
+            juego = Partida(j1, j2)
+            partidas.append(juego)
+            lock_partidas.release()
+            threading.Thread(target=jugar_partida, args=(juego,)).start()
+            print(f'{len(partidas)}')
+        else:  # Registrar usuario al lobby
+            usuarios_lobby.append(Cliente(nombre_decoded, clt_socket))  # Usuario en lobby
+        lock_lobby.release()
+
+    if cola.size > 1 and len(partidas) < max_partidas:
         lock_partidas.acquire()
+        j1 = cola.desencolar()
+        j2 = cola.desencolar()
         juego = Partida(j1, j2)
         partidas.append(juego)
         lock_partidas.release()
         threading.Thread(target=jugar_partida, args=(juego,)).start()
-    else:  # Registrar usuario al lobby
-        usuarios_lobby.append(Cliente(nombre_decoded, clt_socket))  # Usuario en lobby
-    lock_lobby.release()
 
 
 def jugar_partida(partida):
@@ -96,12 +114,15 @@ def jugar_partida(partida):
         if resultado_decodificado is not None and resultado_decodificado["victoria"]:
             print("Partida terminada. Ha ganado:", jugadores[jugador_activo].nombre)
             # TODO Actualizar algo en la lista de partidas?
+            partidas.remove(partida)
             break
 
         # Actualizar el índice del jugador activo
         jugador_activo = (jugador_activo+1) % 2
 
         turno += 1
+
+    print(len(partidas))
 
 
 print("Arrancando servidor...")
@@ -112,6 +133,8 @@ server_socket.listen()
 # Imprimir IP del servidor
 nombre_server = socket.gethostname()
 print(socket.gethostbyname(nombre_server))
+# Crear objeto cola
+cola = Cola()
 
 try:
     while True:
@@ -119,6 +142,9 @@ try:
         if client_socket:
             print("Cliente conectado: ", addr)
             threading.Thread(target=bienvenida_usuario, args=(client_socket,)).start()
+
+
+
 except KeyboardInterrupt:
     print("Apagado solicitado")
 

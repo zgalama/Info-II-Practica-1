@@ -5,8 +5,8 @@ from jugador import Jugador
 import sys
 import socket
 
-ip = sys.argv[1]
-puerto = int(sys.argv[2])
+ip = '127.0.0.1'
+puerto = 5555
 
 
 def main():
