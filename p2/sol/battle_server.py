@@ -38,35 +38,22 @@ def bienvenida_usuario(clt_socket):
         return
     nombre_decoded = nombre.decode()
 
-    if len(partidas) == max_partidas:
-        j = Cliente(nombre_decoded, clt_socket)
-        cola.encolar(j)
-    else:
-        # Meter cliente a lobby o emparejar si hay alguien esperando
-        lock_lobby.acquire()
-        if len(usuarios_lobby) != 0:  # Alguien esperando a jugar, emparejar
-            assert len(usuarios_lobby) == 1
-            j1 = usuarios_lobby[0]
-            del usuarios_lobby[0]
-            j2 = Cliente(nombre_decoded, clt_socket)
-            lock_partidas.acquire()
-            juego = Partida(j1, j2)
-            partidas.append(juego)
-            lock_partidas.release()
-            threading.Thread(target=jugar_partida, args=(juego,)).start()
-            print(f'{len(partidas)}')
-        else:  # Registrar usuario al lobby
-            usuarios_lobby.append(Cliente(nombre_decoded, clt_socket))  # Usuario en lobby
-        lock_lobby.release()
-
-    if cola.size > 1 and len(partidas) < max_partidas:
+    # Meter cliente a lobby o emparejar si hay alguien esperando
+    lock_lobby.acquire()
+    if len(usuarios_lobby) != 0:  # Alguien esperando a jugar, emparejar
+        assert len(usuarios_lobby) == 1
+        j1 = usuarios_lobby[0]
+        del usuarios_lobby[0]
+        j2 = Cliente(nombre_decoded, clt_socket)
         lock_partidas.acquire()
-        j1 = cola.desencolar()
-        j2 = cola.desencolar()
         juego = Partida(j1, j2)
         partidas.append(juego)
         lock_partidas.release()
         threading.Thread(target=jugar_partida, args=(juego,)).start()
+        print(f'{len(partidas)}')
+    else:  # Registrar usuario al lobby
+        usuarios_lobby.append(Cliente(nombre_decoded, clt_socket))  # Usuario en lobby
+    lock_lobby.release()
 
 
 def jugar_partida(partida):
@@ -113,7 +100,6 @@ def jugar_partida(partida):
         if resultado_decodificado is not None and resultado_decodificado["victoria"]:
             print("Partida terminada. Ha ganado:", jugadores[jugador_activo].nombre)
             # TODO Actualizar algo en la lista de partidas?
-            partidas.remove(partida)
             break
 
         # Actualizar el índice del jugador activo
@@ -122,7 +108,6 @@ def jugar_partida(partida):
         turno += 1
 
     print(len(partidas))
-
 
 print("Arrancando servidor...")
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -141,8 +126,6 @@ try:
         if client_socket:
             print("Cliente conectado: ", addr)
             threading.Thread(target=bienvenida_usuario, args=(client_socket,)).start()
-
-
 
 except KeyboardInterrupt:
     print("Apagado solicitado")
