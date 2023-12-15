@@ -8,7 +8,6 @@ import socket
 ip = '127.0.0.1'
 puerto = 5555
 
-
 def main():
     # Conectamos con el servidor
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

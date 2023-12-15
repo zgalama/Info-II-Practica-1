@@ -22,7 +22,6 @@ class Partida:
         self.j1 = j1
         self.j2 = j2
 
-
 class Cliente:
     def __init__(self, nombre, skt):
         self.nombre = nombre
@@ -127,7 +126,7 @@ def jugar_partida(partida):
 
 print("Arrancando servidor...")
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((socket.gethostname(), puerto))
+server_socket.bind(('127.0.0.1', puerto))
 server_socket.listen()
 
 # Imprimir IP del servidor
