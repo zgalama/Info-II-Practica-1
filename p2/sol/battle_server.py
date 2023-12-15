@@ -14,8 +14,11 @@ max_partidas = 1
 
 lock_lobby = threading.Lock()
 lock_partidas = threading.Lock()
+lock_cola_espera = threading.Lock()  # Agrega la declaración del candado aquí
+
 usuarios_lobby = []
-partidas = []
+partidas_en_curso = []
+cola_espera = Cola()
 
 class Partida:
     def __init__(self, j1, j2):
@@ -27,9 +30,29 @@ class Cliente:
         self.nombre = nombre
         self.socket = skt
 
+def manejar_cola_espera():
+    while True:
+        if not cola_espera.vacia() and len(partidas_en_curso) < max_partidas:
+            lock_cola_espera.acquire()
+            cliente_en_espera = cola_espera.desencolar()
+            lock_cola_espera.release()
+
+            lock_partidas.acquire()
+            j1 = usuarios_lobby[0]
+            j2 = cliente_en_espera
+            juego = Partida(j1, j2)
+            partidas_en_curso.append(juego)
+            threading.Thread(target=jugar_partida, args=(juego,)).start()
+            print(f'{len(partidas_en_curso)} partidas en curso')
+            lock_partidas.release()
+
 def bienvenida_usuario(clt_socket):
     global lock_lobby
     global lock_partidas
+    global lock_cola_espera
+    global partidas_en_curso
+    global cola_espera
+
     # Elegir nombre de usuario
     nombre = clt_socket.recv(1024)
     if not nombre:
@@ -45,14 +68,43 @@ def bienvenida_usuario(clt_socket):
         j1 = usuarios_lobby[0]
         del usuarios_lobby[0]
         j2 = Cliente(nombre_decoded, clt_socket)
+
         lock_partidas.acquire()
-        juego = Partida(j1, j2)
-        partidas.append(juego)
-        lock_partidas.release()
-        threading.Thread(target=jugar_partida, args=(juego,)).start()
-        print(f'{len(partidas)}')
+        try:
+            if len(partidas_en_curso) < max_partidas:  # Asegurémonos de que no exceda el límite
+                juego = Partida(j1, j2)
+                partidas_en_curso.append(juego)
+                threading.Thread(target=jugar_partida, args=(juego,)).start()
+                print(f'{len(partidas_en_curso)} partidas en curso')
+            else:
+                lock_cola_espera.acquire()
+                cola_espera.encolar(j2)
+                lock_cola_espera.release()
+                print(f'Cliente en cola de espera ({cola_espera.size} en espera)')
+        finally:
+            lock_partidas.release()
+
     else:  # Registrar usuario al lobby
         usuarios_lobby.append(Cliente(nombre_decoded, clt_socket))  # Usuario en lobby
+        lock_cola_espera.acquire()
+        if cola_espera.size > 0 and len(partidas_en_curso) < max_partidas:
+            cliente_en_espera = cola_espera.desencolar()
+            j1 = cliente_en_espera
+            j2 = usuarios_lobby[0]
+
+            lock_partidas.acquire()
+            try:
+                if len(partidas_en_curso) < max_partidas:
+                    juego = Partida(j1, j2)
+                    partidas_en_curso.append(juego)
+                    threading.Thread(target=jugar_partida, args=(juego,)).start()
+                    print(f'{len(partidas_en_curso)} partidas en curso')
+                else:
+                    cola_espera.encolar(j2)
+                    print(f'Cliente en cola de espera ({cola_espera.size} en espera)')
+            finally:
+                lock_partidas.release()
+        lock_cola_espera.release()
     lock_lobby.release()
 
 
@@ -107,7 +159,7 @@ def jugar_partida(partida):
 
         turno += 1
 
-    print(len(partidas))
+    print(len(partidas_en_curso))
 
 print("Arrancando servidor...")
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -117,10 +169,10 @@ server_socket.listen()
 # Imprimir IP del servidor
 nombre_server = socket.gethostname()
 print(socket.gethostbyname(nombre_server))
-# Crear objeto cola
-cola = Cola()
 
 try:
+     # Inicia un hilo para manejar la cola de espera
+    threading.Thread(target=manejar_cola_espera).start()
     while True:
         client_socket, addr = server_socket.accept()
         if client_socket:
