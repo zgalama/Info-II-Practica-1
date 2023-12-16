@@ -3,7 +3,6 @@ import socket
 import pickle
 import sys
 import threading
-
 from cola import Cola, Nodo
 
 # puerto = int(sys.argv[1])
@@ -71,7 +70,7 @@ def bienvenida_usuario(clt_socket):
 
         lock_partidas.acquire()
         try:
-            if len(partidas_en_curso) < max_partidas:  # Asegurémonos de que no exceda el límite
+            if len(partidas_en_curso) <= max_partidas:  # Asegurémonos de que no exceda el límite
                 juego = Partida(j1, j2)
                 partidas_en_curso.append(juego)
                 threading.Thread(target=jugar_partida, args=(juego,)).start()

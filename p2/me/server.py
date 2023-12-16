@@ -1,211 +1,261 @@
-import random
 import socket
-import pickle
-import sys
 import threading
+import time
+from utils_2 import Cliente, Server, Partida, tirar_moneda, comprobar_conexion
 
-class Nodo:
-    def __init__(self, dato, next):
-        self.dato = dato
-        self.next = next
+# -- SERVIDOR -- #
 
-class Cola:
-    def __init__(self):
-        self.first = None
-        self.last = None
-        self.size = 0
+s = Server()
+id_c = 0 # -- cuando se reinicia el servidor las id empezaran desde 0
+id_p = 0
 
-    def vacia(self):
-        return self.size == 0
-
-    def peek(self):
-        if self.vacia():
-            return None
-        return self.first.dato
-
-    def encolar(self, dato):
-        nodo = Nodo(dato, None)
-
-        if self.vacia():
-            self.first = nodo
-            self.last = nodo
-        else:
-            self.last.next = nodo
-            self.last = nodo
-
-        self.size += 1
-
-    def desencolar(self):
-        if self.vacia():
-            return None
-        sacar = self.first
-        if self.size == 1:
-            self.first = None
-            self.last = None
-        else:
-            self.first = self.first.next
-
-        self.size -= 1
-        return sacar.dato
-
-puerto = 5555
-max_partidas = 1
-
-lock_lobby = threading.Lock()
-lock_partidas = threading.Lock()
-lock_cola_espera = threading.Lock()
-
-usuarios_lobby = Cola()  # Cambio aquí
-partidas_en_curso = []
-cola_espera = Cola()
-
-class Partida:
-    def __init__(self, j1, j2):
-        self.j1 = j1
-        self.j2 = j2
-
-class Cliente:
-    def __init__(self, nombre, skt):
-        self.nombre = nombre
-        self.socket = skt
-
-def manejar_cola_espera():
-    while True:
-        if not cola_espera.vacia() and len(partidas_en_curso) < max_partidas:
-            lock_cola_espera.acquire()
-            cliente_en_espera = cola_espera.desencolar()
-            lock_cola_espera.release()
-
-            lock_partidas.acquire()
-            j1 = usuarios_lobby.desencolar()  # Cambio aquí
-            j2 = cliente_en_espera
-            juego = Partida(j1, j2)
-            partidas_en_curso.append(juego)
-            threading.Thread(target=jugar_partida, args=(juego,)).start()
-            print(f'{len(partidas_en_curso)} partidas en curso')
-            lock_partidas.release()
-
-def bienvenida_usuario(clt_socket):
-    global lock_lobby
-    global lock_partidas
-    global lock_cola_espera
-    global partidas_en_curso
-    global cola_espera
-    global usuarios_lobby
-
-    nombre = clt_socket.recv(1024)
-    if not nombre:
-        clt_socket.close()
-        print("El cliente ha cancelado la conexión antes de elegir nombre")
-        return
-    nombre_decoded = nombre.decode()
-
-    lock_lobby.acquire()
-    if not usuarios_lobby.vacia():  
-        j1 = usuarios_lobby.desencolar()  # Cambio aquí
-        j2 = Cliente(nombre_decoded, clt_socket)
-
-        lock_partidas.acquire()
-        try:
-            if len(partidas_en_curso) < max_partidas:
-                juego = Partida(j1, j2)
-                partidas_en_curso.append(juego)
-                threading.Thread(target=jugar_partida, args=(juego,)).start()
-                print(f'{len(partidas_en_curso)} partidas en curso')
-            else:
-                lock_cola_espera.acquire()
-                cola_espera.encolar(j2)
-                lock_cola_espera.release()
-                print(f'Cliente en cola de espera ({cola_espera.size} en espera)')
-        finally:
-            lock_partidas.release()
-
-    else:
-        usuarios_lobby.encolar(Cliente(nombre_decoded, clt_socket))  
-        lock_cola_espera.acquire()
-        if cola_espera.size > 0 and len(partidas_en_curso) < max_partidas:
-            cliente_en_espera = cola_espera.desencolar()
-            j1 = cliente_en_espera
-            j2 = usuarios_lobby.desencolar()  # Cambio aquí
-
-            lock_partidas.acquire()
-            try:
-                if len(partidas_en_curso) < max_partidas:
-                    juego = Partida(j1, j2)
-                    partidas_en_curso.append(juego)
-                    threading.Thread(target=jugar_partida, args=(juego,)).start()
-                    print(f'{len(partidas_en_curso)} partidas en curso')
-                else:
-                    cola_espera.encolar(j2)
-                    print(f'Cliente en cola de espera ({cola_espera.size} en espera)')
-            finally:
-                lock_partidas.release()
-        lock_cola_espera.release()
-    lock_lobby.release()
-
-def jugar_partida(partida):
-    print(f"Partida comenzada entre {partida.j1.nombre} y {partida.j2.nombre}")
-
-    jugadores = [partida.j1, partida.j2]  
-
-    jugadores[0].socket.sendall(jugadores[1].nombre.encode())
-    jugadores[1].socket.sendall(jugadores[0].nombre.encode())
-
-    jugador_activo = random.randint(0, 1)
-    empieza_j1 = jugador_activo == 0
-
-    jugadores[0].socket.sendall(pickle.dumps(empieza_j1))
-    jugadores[1].socket.sendall(pickle.dumps(not empieza_j1))
-
-    jugadores[0].socket.recv(1024)
-    jugadores[1].socket.recv(1024)
-
-    turno = 1
-    while True:
-        print("Ronda", turno, ". Ataca:", jugadores[jugador_activo].nombre, "Defiende:", jugadores[jugador_activo-1].nombre)
-        codigo = jugadores[jugador_activo].socket.recv(1024)
-
-        print("Contactando con el oponente para recibir resultado")
-        jugadores[jugador_activo-1].socket.sendall(codigo)
-
-        resultado = jugadores[jugador_activo-1].socket.recv(1024)
-        resultado_decodificado = pickle.loads(resultado)
-        print("Resultado recibido:", resultado_decodificado)
-
-        print("Enviando resultado al atacante")
-        jugadores[jugador_activo].socket.sendall(resultado)
-
-        if resultado_decodificado is not None and resultado_decodificado["victoria"]:
-            print("Partida terminada. Ha ganado:", jugadores[jugador_activo].nombre)
-            break
-
-        jugador_activo = (jugador_activo+1) % 2
-        turno += 1
-
-    print(len(partidas_en_curso))
-
-print("Arrancando servidor...")
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('127.0.0.1', puerto))
-server_socket.listen()
+server_socket_ping =socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-nombre_server = socket.gethostname()
-print(socket.gethostbyname(nombre_server))
+server_socket.bind(('localhost', 7777))
+server_socket_ping.bind(('localhost', 7778))
 
-try:
-    threading.Thread(target=manejar_cola_espera).start()
+# -- FUNCIONES DEL SERVIDOR --
+
+# -- Funcion que gestiona conexiones entrantes
+def conexión_entrante(cl_sock,cl_sock_ping):
+
+    # RECV 1
+    name = cl_sock.recv(1024).decode() # Añadir if not name: cerrar
+    cl = Cliente(name, cl_sock, cl_sock_ping)
+    print(f'Jugador conectado: [{cl.name}]')
+
+    if len(s.lobby) != 2:
+        s.lobby.append(cl)
+        if len(s.lobby) == 1:
+            cl.id_c = 0
+            cl_sock.send(('0').encode())
+            print(f'Lobby: [{s.lobby[0].name}]')
+
+        else:
+            id_c = 1
+            cl_sock.send(('1').encode())
+            print(f'Lobby: [{s.lobby[0].name, s.lobby[1].name}]')
+
+    return cl
+
+# - Funcion echo con clientes, hilo utilizando otro socket para enviar mensajes que verifiquen la conexion
+
+def handle_clients(cl1, cl2, p):
+    try:
+        while True:
+            data1 = cl1.socket_ping.recv(1024)
+
+            if not data1:
+                print(f'{cl1.name} desconectado')
+                print(f'Partida [ID:{p.id}] terminada')
+                cl2.socket_ping.send('out'.encode())
+                cl2.socket_ping.close()
+                cl2.socket.close()
+                break
+            else:
+                cl2.socket_ping.send('ok'.encode())
+
+            data2 = cl2.socket_ping.recv(1024)
+
+            if not data2:
+                print(f'{cl2.name} desconectado')
+                print(f'Partida [ID:{p.id}] terminada')
+                cl1.socket_ping.send('out'.encode())
+                cl1.socket_ping.close()
+                cl1.socket.close()
+                break
+            else:
+                cl1.socket_ping.send('ok'.encode())
+
+    except ConnectionResetError:
+        pass
+
+    except OSError:
+        pass
+
+
+
+# -- Funcion de ejecución del Juego para cada partida (en hilo)
+def start_game(cl1, cl2):
+
+    global id_p
+    global s
+
+    p = Partida(cl1.socket, cl2.socket, cl1.name, cl2.name, id_p)  # -- Crear un objeto partida
+
+    try:
+
+        game_conection = threading.Thread(target=handle_clients, args=(s.lobby[0],s.lobby[1], p))
+        game_conection.start()
+
+        s.lobby = [] # -- Vaciar el Lobby para que nuevos usuarios puedan empezar otras partidas
+        id_p += 1 # -- Para que la siguiente partida tenga un id distinto
+
+        s.sockets.extend([cl1.socket,cl2.socket])
+
+        print(f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]')
+
+        # ENV 1
+
+        mensaje_inicio = (f'Partida comenzada / ID:{p.id} [{cl1.name} vs {cl2.name}]\n')
+        cl1.socket.send(mensaje_inicio.encode())
+        cl2.socket.send(mensaje_inicio.encode())
+
+        time.sleep(2)
+
+        # Seleccionar primer turno lanzando una moneda
+
+        turno = p.tirar_moneda()
+
+        if turno == 1:
+            cl1.socket.send(str(0).encode())
+            cl2.socket.send(str(1).encode())
+        elif turno == 0:
+            cl1.socket.send(str(1).encode())
+            cl2.socket.send(str(0).encode())
+
+        time.sleep(1)
+
+        ### - RECIBIR INFO DE J1 Y J2 CON PICKLE
+        info_j1 = cl1.socket.recv(1024)
+
+        info_j2 = cl2.socket.recv(1024)
+
+        time.sleep(3)
+
+        opo_j1 = cl1.socket.sendall(info_j2)
+        opo_j2 = cl2.socket.sendall(info_j1)
+
+
+        if turno == 0: # Si empieza jugando cl1         Lobby: [cl1,cl2]
+
+            fin = False
+
+            while not fin:
+
+                act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
+                cl1.socket.send(act)
+
+                cl2.socket.send('ok'.encode())
+
+                eq = cl2.socket.recv(8000)
+                ok = cl1.socket.recv(1024)
+                cl1.socket.send(eq)
+
+                men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
+                if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
+                    fin = True
+                    fin_msg = 'fin'
+                    cl2.socket.send((fin_msg).encode())
+                    break
+                cl2.socket.send(men)
+
+                act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
+                cl2.socket.send(act)
+
+                cl1.socket.send('ok'.encode())
+
+                eq = cl1.socket.recv(8000)
+                ok = cl2.socket.recv(1024)
+                cl2.socket.send(eq)
+
+                men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
+                if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
+                    fin = True
+                    fin_msg = 'fin'
+                    cl1.socket.send((fin_msg).encode())
+                    break
+                cl1.socket.send(men)
+
+        if turno == 1: # Si empieza jugando cl2         Lobby: [cl1,cl2]
+
+            fin = False
+
+            while not fin:
+
+                act = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
+                cl2.socket.send(act)
+
+                cl1.socket.send('ok'.encode())
+
+                eq = cl1.socket.recv(8000) # Recibe la actualizacion de Cl1 y lo envia a Cl2
+                ok = cl2.socket.recv(1024)
+                cl2.socket.send(eq)
+
+                men = cl2.socket.recv(8000) # Recibe la accion realizada por Cl2 y la envia a Cl1
+                if men.decode() == 'fin':   # Si el mensaje es fin, se acaba la partida
+                    fin = True
+                    fin_msg = 'fin'
+                    cl1.socket.send((fin_msg).encode())
+                    break
+                cl1.socket.send(men)
+
+                act = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
+                cl1.socket.send(act)
+
+                cl2.socket.send('ok'.encode())
+
+                eq = cl2.socket.recv(8000) # Recibe la actualizacion de Cl2 y lo envia a Cl1
+                ok = cl1.socket.recv(1024)
+                cl1.socket.send(eq)
+
+                men = cl1.socket.recv(8000) # Recibe la accion realizada por Cl1 y la envia a Cl2
+                if men.decode() == 'fin':
+                    fin = True
+                    fin_msg = 'fin'
+                    cl2.socket.send((fin_msg).encode())
+                    break
+                cl2.socket.send(men)
+
+            print(f'Partida ID:{p.id} finalizada')
+
+    except:
+        pass
+
+
+
+# -- PROGRAMA SERVIDOR --
+
+def main():
+
+    print('-- Servidor operativo -- \n')
+    server_socket.listen()
+    server_socket_ping.listen()
+
     while True:
-        client_socket, addr = server_socket.accept()
-        if client_socket:
-            print("Cliente conectado: ", addr)
-            threading.Thread(target=bienvenida_usuario, args=(client_socket,)).start()
 
-except KeyboardInterrupt:
-    print("Apagado solicitado")
+        try:
+            cl_socket, addr = server_socket.accept()
+            cl_socket_ping, addr = server_socket_ping.accept()
 
-server_socket.close()
-print("Apagando servidor...")
+            cl = conexión_entrante(cl_socket,cl_socket_ping)
 
+            if len(s.lobby) == 2:
+                game = threading.Thread(target=start_game, args=(s.lobby[0],s.lobby[1]))
+                game.start()
+            else:
+                print('Esperando otro jugador...')
+
+        except KeyboardInterrupt:
+            print(' -- Servidor cerrado -- ')
+            break
+        
+        except OSError:
+            print(' -- Servidor cerrado -- ')
+
+
+
+    # -- Cerrar servidor --
+
+    for socket in s.sockets:
+        socket.close()
+    server_socket.close()
+
+
+if __name__ == '__main__':
+
+    main()
 
 
 
