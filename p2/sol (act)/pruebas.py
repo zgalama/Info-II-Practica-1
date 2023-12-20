@@ -19,7 +19,7 @@ lock_cola_espera = threading.Lock()  # Agrega la declaración del candado aquí
 usuarios_lobby = []
 partidas_en_curso = []
 cola_espera = Cola()
-jugador = Jugador()
+
 
 
 class Partida:
@@ -40,7 +40,7 @@ def manejar_cola_espera():
             lock_cola_espera.release()
 
             lock_partidas.acquire()
-            j1 = usuarios_lobby[0]
+            j1=usuarios_lobby[0]
             j2 = cliente_en_espera
             juego = Partida(j1, j2)
             partidas_en_curso.append(juego)
@@ -110,6 +110,7 @@ def terminar_partida():
     global lock_partidas, cola_espera, partidas_en_curso
     lock_partidas.acquire()
     try:
+
         while len(partidas_en_curso) < max_partidas  and cola_espera.size >= 2:
    
             j1 = cola_espera.desencolar()
@@ -119,25 +120,30 @@ def terminar_partida():
             partidas_en_curso.append(juego)
             threading.Thread(target=jugar_partida, args=(juego,)).start()
             print(f'{len(partidas_en_curso)} partidas en curso')
+
+            if cola_espera ==1:
+                print('Esperando a otro jugador...')
+
     finally:    
             lock_partidas.release()
 
 
 def ranking(j1, j2, ganador, turno, partida):
-    global jugador
+    jugador = Jugador()
     # Puntuaciones base
     puntuacion_ganador = 1000
     puntuacion_perdedor = 0
 
     # Puntuación por personajes vivos y eliminados
-    puntuacion_vivos_j1 = sum(100 for personaje in jugador.info_vivos())
-    puntuacion_vivos_j2 = sum(100 for personaje in jugador.info_vivos())
     j1_vivos = jugador.info_vivos()
     j2_vivos = jugador.info_vivos()
-    puntuacion_eliminados_j1 =  100 * (4 - len(j2_vivos))
-    puntuacion_eliminados_j2 = 100 * (4 - len(j1_vivos))
+    puntuacion_vivos_j1 = sum(100 * j1_vivos)
+    puntuacion_vivos_j2 = sum(100 * j2_vivos)
 
-    # Puntuación por turnos restantes (máximo 200 puntos)
+    puntuacion_eliminados_j1 =  100 * (4 - j2_vivos)
+    puntuacion_eliminados_j2 = 100 * (4 - j1_vivos)
+
+    # Puntuación por turnos restantes
     puntuacion_turnos_g = max(0, (20 - (turno * 2))) * 20
     puntuacion_turnos_p = 0
     if (turno * 2) > 10: ((turno * 2) - 10) * 20
@@ -156,8 +162,11 @@ def ranking(j1, j2, ganador, turno, partida):
     }
     print(turno)
 
+    #Nos dice el nombre y puntuacion de cada jugador
     for jugador, puntuacion in puntuaciones.items():
         print(f'{jugador}: {puntuacion}')
+    
+
 
 
     # Actualizamos ranking con puntuacion de los jugadores
